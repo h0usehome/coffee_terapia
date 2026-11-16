@@ -91,7 +91,7 @@ const p=pos();return["ok","Кружка добавлена: "+p+" из "+CUPS_MA
 
 /* ===== Экраны ===== */
 let S={tab:"home",sub:null,p:null,sel:[],cat:"Кофе",rtt:"pd",msg:null,code:""};
-const top=(t)=>`<div class="row"><button class="ch ib" data-act="back" aria-label="Назад">${ic('<path d="M15 5l-7 7 7 7"/>')}</button><h1 class="h" style="font-size:20px">${t}</h1></div>`;
+const hdr=(t)=>`<div class="row"><button class="ch ib" data-act="back" aria-label="Назад">${ic('<path d="M15 5l-7 7 7 7"/>')}</button><h1 class="h" style="font-size:20px">${t}</h1></div>`;
 const mark=`<div><div style="font-family:Unbounded,sans-serif;font-weight:600;font-size:22px;letter-spacing:.06em;color:var(--br)">терапия</div><div style="font-size:11px;letter-spacing:.12em;color:var(--mu)">место вкуса и встреч</div></div>`;
 const cell=(n,c)=>n===5?`<div class="cell ${c>=5?"g":"go"}">${ic(CANDY)}</div>`:n===10?`<div class="cell ${c>=10?"g":"go"}">${ic(CROI)}</div>`:n===15?`<div class="cell ${c>=15?"g":"go"}">${ic(CUP)}</div>`:n<=c?`<div class="cell f">${ic(CUP,20)}</div>`:`<div class="cell e"></div>`;
 const sg=(x,y,s)=>s==="o"?`<circle cx="${x}" cy="${y}" r="12" fill="#E5D6C6" stroke="#C9B3A0" stroke-width="1.5"/><path d="M${x-4} ${y-4}l8 8m0-8l-8 8" stroke="#7A5F57" stroke-width="1.8" stroke-linecap="round"/>`:s==="s"?`<circle cx="${x}" cy="${y}" r="12" fill="#4A1E1B"/><path d="M${x-5} ${y}l3.5 3.5 6.5-7" stroke="#F6EFE6" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:`<circle cx="${x}" cy="${y}" r="12" fill="#FFFAF4" stroke="#B9A18F" stroke-width="1.5"/>`;
@@ -122,7 +122,7 @@ return `<h1 class="h">Карта</h1><div class="k col"><div class="row sb"><b>�
 <div class="m" style="line-height:1.6">5 кружек — конфета<br>10 кружек — круассан<br>15 кружек — кофе в подарок</div></div>
 <button class="bt" data-sub="code">Добавить кружку</button>
 <div class="k" style="padding:6px 16px 0"><b style="display:block;padding:10px 0">Последние кружки</b>${h||'<div class="m" style="padding-bottom:14px">Пока пусто. Добавьте код с чека.</div>'}</div>`},
-code:()=>`${top("Добавить кружку")}<div class="m" style="line-height:1.5">На каждом чеке свой одноразовый код. Отсканируйте QR или введите код вручную.</div>
+code:()=>`${hdr("Добавить кружку")}<div class="m" style="line-height:1.5">На каждом чеке свой одноразовый код. Отсканируйте QR или введите код вручную.</div>
 ${S.msg?`<div class="msg ${S.msg[0]==="bad"?"bad":""}" role="status">${S.msg[1]}</div>`:""}
 <button class="bt" data-act="scan">Сканировать QR на чеке</button><div class="m" style="text-align:center">или введите код вручную</div>
 <input id="code" class="fi" aria-label="Код с чека" placeholder="TR-0000-00" value="${esc(S.code)}" autocomplete="off" autocapitalize="characters">
@@ -130,7 +130,7 @@ ${S.msg?`<div class="msg ${S.msg[0]==="bad"?"bad":""}" role="status">${S.msg[1]}
 <div class="k m" style="line-height:1.6">Для теста: ${VALID.join(", ")}</div>`,
 events:()=>`<div><h1 class="h">Вечера</h1><div class="m" style="margin-top:6px">Живая музыка в Терапии. Нужна запись, мест немного.</div></div>${EVENTS.map(evCard).join("")}`,
 seats:()=>{const e=EVENTS.find(x=>x.id===S.p),d=dd(e.date),n=S.sel.length;
-return `${top("Выбор мест")}<div class="dk" style="padding:12px 16px"><b>${e.title}${e.tag?" · "+e.tag.toLowerCase():""}</b><div class="m">${d.w}, ${d.n} ${d.m} · ${e.time}</div></div>${mapSvg(e)}
+return `${hdr("Выбор мест")}<div class="dk" style="padding:12px 16px"><b>${e.title}${e.tag?" · "+e.tag.toLowerCase():""}</b><div class="m">${d.w}, ${d.n} ${d.m} · ${e.time}</div></div>${mapSvg(e)}
 <div class="row sb">${lg("f","Свободно")}${lg("o","Занято")}${lg("s","Ваш выбор")}</div>
 <div class="k row sb" style="padding:12px 16px"><div><b>${n?"Выбрано: "+n+" "+pl(n,["место","места","мест"]):"Выберите места"}</b><div class="m">Можно до 6 мест</div></div>${n?'<button class="ch" data-act="clear">Сбросить</button>':""}</div>
 <button class="bt" style="height:52px;font-size:16px" data-act="book" ${n?"":"disabled"}>${n?"Забронировать "+n+" "+pl(n,["место","места","мест"]):"Забронировать"}</button>`},
@@ -140,7 +140,7 @@ return `<h1 class="h">Вы записаны</h1><div class="dk"><b style="font-s
 menu:()=>`<h1 class="h">Меню</h1><div class="row" style="gap:8px">${Object.keys(MENU).map(k=>`<button class="ch ${k===S.cat?"on":""}" data-act="cat" data-p="${k}">${k}</button>`).join("")}</div>
 <div class="k" style="padding:2px 16px">${MENU[S.cat].map((x,i)=>`<div class="row" style="padding:12px 0;${i?"border-top:1px solid var(--bd);":""}align-items:flex-start"><div class="ph">${ic(CUP,24)}<span>фото</span></div><div style="flex:1"><div class="row sb"><b>${x[0]}</b><b style="color:var(--ac);font-size:14px">${x[2]}</b></div><div class="m" style="margin-top:4px;line-height:1.4">${x[1]}</div></div></div>`).join("")}</div>
 <div class="k row sb" style="border-style:dashed"><div><b style="font-size:14px">Заказ у стойки</b><div class="m">Доставка через Яндекс Еду — скоро</div></div><span class="ch">Скоро</span></div>`,
-route:()=>`${top("Как нас найти")}<svg width="100%" viewBox="0 0 358 200" role="img" aria-label="Схема района с отметкой кофейни"><rect width="358" height="200" rx="20" fill="#EBD9C5"/><path d="M0 60L358 90M0 150L358 130M110 0L140 200M250 0L230 200" stroke="#FFFAF4" stroke-width="12"/><path d="M179 118c-14-17-22-26-22-36a22 22 0 0 1 44 0c0 10-8 19-22 36z" fill="#4A1E1B"/><circle cx="179" cy="82" r="8" fill="#F6EFE6"/></svg>
+route:()=>`${hdr("Как нас найти")}<svg width="100%" viewBox="0 0 358 200" role="img" aria-label="Схема района с отметкой кофейни"><rect width="358" height="200" rx="20" fill="#EBD9C5"/><path d="M0 60L358 90M0 150L358 130M110 0L140 200M250 0L230 200" stroke="#FFFAF4" stroke-width="12"/><path d="M179 118c-14-17-22-26-22-36a22 22 0 0 1 44 0c0 10-8 19-22 36z" fill="#4A1E1B"/><circle cx="179" cy="82" r="8" fill="#F6EFE6"/></svg>
 <div class="k col" style="gap:6px"><b>Туровского, 24, пом. 209</b><div class="m">Минск · МАЯК МИНСКА</div><div class="m">С 7:30 свежие круассаны, открыто до 22:00</div></div>
 <div class="row" style="gap:8px">${[["pd","Пешком"],["auto","На авто"],["mt","Транспорт"]].map(x=>`<button class="ch ${S.rtt===x[0]?"on":""}" data-act="rtt" data-p="${x[0]}">${x[1]}</button>`).join("")}</div>
 <button class="bt" style="height:52px;font-size:16px" data-act="route">Построить маршрут в Яндекс Картах</button><button class="bt o" data-act="map">Открыть на карте</button><button class="bt o" style="border-color:var(--bd2);color:var(--mu)" data-act="copy">Скопировать адрес</button>`
