@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Терапия</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F6EFE6;--card:#FFFAF4;--bd:#E5D6C6;--bd2:#D9C5B2;--ink:#3A1613;--mu:#7A5F57;--br:#4A1E1B;--ac:#B4531A;--ok:#2F7D4F}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Manrope,system-ui,sans-serif;touch-action:manipulation;-webkit-text-size-adjust:100%}
+button,input{font-family:inherit}
+button{color:inherit;cursor:pointer;transition:transform .12s ease,background-color .2s,opacity .2s}
+button:active:not(:disabled){transform:scale(.96)}
+#app{max-width:480px;min-height:100vh;margin:0 auto}
+#view{padding:24px 16px 96px;display:flex;flex-direction:column;gap:14px}
+#view.sub{padding-bottom:24px}
+.h{font-family:Unbounded,sans-serif;font-weight:600;font-size:22px;margin:0;line-height:1.2}
+.k{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:16px}
+.dk{background:var(--br);color:#F6EFE6;border-radius:24px;padding:18px}
+.m{font-size:13px;color:var(--mu)}.dk .m{color:#E3CDBF}
+.row{display:flex;align-items:center;gap:12px}.sb{justify-content:space-between}.col{display:flex;flex-direction:column;gap:12px}
+.bt{height:48px;border:0;border-radius:14px;background:var(--br);color:#F6EFE6;font-weight:700;font-size:15px;padding:0 20px;width:100%}
+.bt.l{background:#F6EFE6;color:var(--br)}.bt.o{background:none;color:var(--br);border:1.5px solid var(--br)}.bt:disabled{opacity:.4}
+.ch{padding:8px 14px;border-radius:999px;border:1px solid var(--bd2);background:var(--card);font-weight:600;font-size:13px;white-space:nowrap}
+.ch.on{background:var(--br);color:#F6EFE6;border-color:var(--br)}
+.ib{width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center}
+.bar{height:8px;border-radius:4px;background:#6E3D37;overflow:hidden}.bar i{display:block;height:100%;background:#F2B26B}
+.t{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:72px;padding-bottom:env(safe-area-inset-bottom);box-sizing:content-box;background:var(--card);border-top:1px solid var(--bd);display:flex}
+.t button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:600;color:var(--mu)}
+.t button.on{color:var(--br);font-weight:800}
+.cell{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.f{background:var(--br);color:#F6EFE6}.e{border:1.5px dashed #C9B3A0}.g{background:var(--ac);color:#fff}.go{border:2px solid var(--ac);color:var(--ac)}
+.pill{height:34px;flex:1;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.dt{width:56px;height:60px;border-radius:16px;background:var(--br);color:#F6EFE6;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none}
+.dt b{font-family:Unbounded,sans-serif;font-size:20px;line-height:1}.dt span{font-size:11px;margin-top:4px}
+.fi{width:100%;height:48px;border:1px solid var(--bd2);border-radius:14px;background:var(--card);padding:0 14px;font:500 16px Manrope,sans-serif;color:var(--ink);text-align:center;letter-spacing:.1em;font-weight:700}
+.ph{background:#EBD9C5;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--mu);font-size:10px;flex:none;width:76px;height:76px;object-fit:cover}
+.msg{padding:12px 16px;border-radius:14px;background:#E7F1EA;color:#1F5A38;font-weight:600;font-size:14px}.msg.bad{background:#F8E4DD;color:#8A2E12}
+@keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes grow{from{width:0}}
+.go{animation:in .32s cubic-bezier(.2,.7,.2,1)}.go .bar i{animation:grow .7s cubic-bezier(.2,.7,.2,1)}
+</style>
+</head>
+<body>
+<div id="app"><main id="view"></main><nav class="t" id="tabs" aria-label="Разделы"></nav></div>
+<script>
+/* ===== Настройки кофейни (замените на свои) ===== */
+const ADDR="Минск, Туровского 24";
+const CUPS_MAX=15, REW={5:"конфета",10:"круассан",15:"кофе в подарок"};
+/* Демо-коды для проверки. В рабочей версии коды проверяет сервер. */
+const VALID=["TR-7K4Q-92","TR-1M8X-45","TR-9P2D-17"];
+const MENU={"Кофе":[["Эспрессо","Короткий и крепкий","[цена]"],["Капучино","Эспрессо и молочная пена","[цена]"],["Латте","Эспрессо и много молока","[цена]"],["Флэт уайт","Двойной эспрессо с молоком","[цена]"],["Матча-латте","Зелёный чай матча с молоком","[цена]"]],
+"Обеды":[["Полезная тарелка","С 12:00 пн–пт, пока не съедят","19 руб"],["Суп дня, 270 г","Добавка к обеду","6,0 руб"],["Хлеб, 30 г","Добавка к обеду","1,5 руб"]]};
+const TABLES=[[1,80,115,"NESW"],[2,179,115,"NESW"],[3,278,115,"WE"],[4,80,235,"WE"],[5,179,235,"NESW"],[6,278,235,"NESW"]];
+const ALL=TABLES.flatMap(t=>[...t[3]].map(p=>t[0]+p));
+const EVENTS=[{id:"e1",date:"2026-11-19",title:"Музыкальный вечер",tag:"Виолончель",time:"19:00",occ:["1N","1E","2W","5S","6N","6W","6E"]},
+{id:"e2",date:"2026-12-03",title:"Кино и пианино",tag:"",time:"19:00",occ:["1N","4W","5N"]},
+{id:"e3",date:"2026-12-17",title:"Музыкальный вечер",tag:"Фортепиано",time:"19:00",occ:"all"}];
+
+/* ===== Утилиты ===== */
+const tg=window.Telegram&&window.Telegram.WebApp,inTg=!!(tg&&tg.initData),$=s=>document.querySelector(s);
+if(inTg){tg.ready();tg.expand();tg.setHeaderColor("#F6EFE6");tg.setBackgroundColor("#F6EFE6");}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LS={g(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const DB=Object.assign({cups:0,hist:[],used:[],visits:[],book:{},wait:{}},LS.g("tdb",{}));
+const save=()=>LS.s("tdb",DB);
+const hap=k=>{try{if(inTg){k?tg.HapticFeedback.notificationOccurred(k):tg.HapticFeedback.impactOccurred("light")}else if(navigator.vibrate)navigator.vibrate(k?[15,30,15]:10)}catch(e){}};
+const day=()=>new Date().toISOString().slice(0,10),widx=d=>Math.floor((Date.parse(d)/864e5+3)/7);
+const pl=(n,a)=>{const m=n%100,k=n%10;return a[m>10&&m<20?2:k===1?0:k>1&&k<5?1:2]};
+const WD=["вс","пн","вт","ср","чт","пт","сб"],MG=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+const dd=s=>{const d=new Date(s+"T12:00:00");return{n:d.getDate(),m:MG[d.getMonth()],ms:MG[d.getMonth()].slice(0,3),w:WD[d.getDay()]}};
+const ic=(p,s=22,w=2)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const CUP='<path d="M5 9h11v4a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5zM16 10h2a2 2 0 0 1 0 4h-2"/>',CANDY='<circle cx="12" cy="12" r="4"/><path d="M8 12L3 9v6zM16 12l5-3v6z"/>',CROI='<path d="M3 16c1-6 5-9 9-9s8 3 9 9c-2-1-3-3-4-5l-2 2-3-4-3 4-2-2c-1 2-2 4-4 5z"/>',CHECK='<path d="M5 12l5 5 9-10"/>';
+const TABS=[["home","Главная",'<path d="M3 11l9-8 9 8v10H3z"/>'],["card","Карта",'<rect x="3" y="6" width="18" height="12" rx="3"/><path d="M3 10h18"/>'],["events","Вечера",'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/>'],["menu","Меню",CUP]];
+const open=u=>{try{inTg?tg.openLink(u):window.open(u,"_blank")}catch(e){window.open(u,"_blank")}};
+
+/* ===== Данные ===== */
+const pos=()=>DB.cups?((DB.cups-1)%CUPS_MAX)+1:0;
+function streak(){const w=new Set(DB.visits.map(widx));let c=widx(day()),n=0;if(!w.has(c))c--;while(w.has(c)){n++;c--}return n}
+const nextEv=()=>EVENTS.find(e=>e.date>=day())||EVENTS[0];
+const taken=e=>e.occ==="all"?ALL:e.occ;
+const left=e=>ALL.length-taken(e).length-(DB.book[e.id]||[]).length;
+function addCode(raw){const c=raw.trim().toUpperCase();
+if(!c)return["bad","Введите код с чека"];
+if(DB.used.includes(c))return["bad","Этот код уже использован"];
+if(!VALID.includes(c))return["bad","Код не найден. Проверьте и попробуйте снова"];
+DB.used.push(c);DB.cups++;DB.hist.unshift({d:day(),n:"Кружка добавлена"});if(!DB.visits.includes(day()))DB.visits.push(day());save();hap("success");
+const p=pos();return["ok","Кружка добавлена: "+p+" из "+CUPS_MAX+(REW[p]?". Награда: "+REW[p]+"!":"")]}
+
+/* ===== Экраны ===== */
+let S={tab:"home",sub:null,p:null,sel:[],cat:"Кофе",rtt:"pd",msg:null,code:""};
+const top=(t)=>`<div class="row"><button class="ch ib" data-act="back" aria-label="Назад">${ic('<path d="M15 5l-7 7 7 7"/>')}</button><h1 class="h" style="font-size:20px">${t}</h1></div>`;
+const mark=`<div><div style="font-family:Unbounded,sans-serif;font-weight:600;font-size:22px;letter-spacing:.06em;color:var(--br)">терапия</div><div style="font-size:11px;letter-spacing:.12em;color:var(--mu)">место вкуса и встреч</div></div>`;
+const cell=(n,c)=>n===5?`<div class="cell ${c>=5?"g":"go"}">${ic(CANDY)}</div>`:n===10?`<div class="cell ${c>=10?"g":"go"}">${ic(CROI)}</div>`:n===15?`<div class="cell ${c>=15?"g":"go"}">${ic(CUP)}</div>`:n<=c?`<div class="cell f">${ic(CUP,20)}</div>`:`<div class="cell e"></div>`;
+const sg=(x,y,s)=>s==="o"?`<circle cx="${x}" cy="${y}" r="12" fill="#E5D6C6" stroke="#C9B3A0" stroke-width="1.5"/><path d="M${x-4} ${y-4}l8 8m0-8l-8 8" stroke="#7A5F57" stroke-width="1.8" stroke-linecap="round"/>`:s==="s"?`<circle cx="${x}" cy="${y}" r="12" fill="#4A1E1B"/><path d="M${x-5} ${y}l3.5 3.5 6.5-7" stroke="#F6EFE6" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:`<circle cx="${x}" cy="${y}" r="12" fill="#FFFAF4" stroke="#B9A18F" stroke-width="1.5"/>`;
+const PD={N:[0,-30],E:[30,0],S:[0,30],W:[-30,0]};
+function mapSvg(e){const o=new Set(taken(e));let g="";
+TABLES.forEach(([n,cx,cy,ps])=>{g+=`<circle cx="${cx}" cy="${cy}" r="18" fill="#E5D6C6"/><text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="13" font-weight="700" fill="#3A1613">${n}</text>`;
+[...ps].forEach((p,i)=>{const id=n+p,x=cx+PD[p][0],y=cy+PD[p][1],st=S.sel.includes(id)?"s":o.has(id)?"o":"f";
+g+=`<g data-seat="${id}" data-st="${st}" role="button" tabindex="0" aria-label="Стол ${n}, место ${i+1}, ${st==="s"?"выбрано":st==="o"?"занято":"свободно"}"><circle cx="${x}" cy="${y}" r="21" fill="transparent"/>${sg(x,y,st)}</g>`})});
+return `<svg viewBox="0 0 358 340" width="100%"><rect x="1" y="1" width="356" height="338" rx="22" fill="#FFFAF4" stroke="#E5D6C6"/><rect x="119" y="14" width="120" height="34" rx="10" fill="#4A1E1B"/><text x="179" y="35" text-anchor="middle" font-size="11" font-weight="700" fill="#F6EFE6">Сцена · пианино</text>${g}<text x="179" y="324" text-anchor="middle" font-size="11" font-weight="700" fill="#7A5F57">ВХОД</text></svg>`}
+const lg=(s,t)=>`<div class="row" style="gap:6px"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">${sg(12,12,s)}</svg><span class="m">${t}</span></div>`;
+function evCard(e){const d=dd(e.date),b=DB.book[e.id],l=left(e);
+const act=b?`<button class="bt o" data-act="ev" data-p="${e.id}">Изменить запись</button>`:l>0?`<button class="bt" data-act="ev" data-p="${e.id}">Записаться</button>`:DB.wait[e.id]?`<button class="bt o" disabled>Вы в листе ожидания</button>`:`<button class="bt o" data-act="wait" data-p="${e.id}">В лист ожидания</button>`;
+return `<div class="k col"><div class="row"><div class="dt"><b>${d.n}</b><span>${d.ms}</span></div><div><b>${e.title}</b><div class="m">${e.tag?e.tag+" · ":""}${d.w}, ${e.time} · ${b?"вы записаны, мест: "+b.length:l>0?"свободно мест: "+l:"мест нет"}</div></div></div>${act}</div>`}
+
+const V={
+home:()=>{const c=pos(),nx=c<5?5:c<10?10:c<15?15:5,l=nx-c,u=inTg&&tg.initDataUnsafe&&tg.initDataUnsafe.user,st=streak(),ev=nextEv(),d=dd(ev.date),b=DB.book[ev.id],cw=widx(day());
+const w=new Set(DB.visits.map(widx)),pills=[5,4,3,2,1,0].map(i=>w.has(cw-i)?`<div class="pill f">${ic(CHECK,16,3)}</div>`:`<div class="pill e"></div>`).join("");
+return `<div class="row sb">${mark}<span class="ch">Открыто до 22:00</span></div>
+<div class="m">Привет${u&&u.first_name?", "+esc(u.first_name):""}!</div>
+<div class="dk col"><div class="row sb"><b style="font-size:16px">Ваша карта</b><span class="m">${c} из ${CUPS_MAX} кружек</span></div><div class="bar"><i style="width:${c/CUPS_MAX*100}%"></i></div>
+<div>${!DB.cups?"Первая кружка ждёт вас":c===15?"Карта заполнена: заберите кофе в подарок":`Ещё ${l} ${pl(l,["кружка","кружки","кружек"])} — и награда: ${REW[nx]}`}</div><button class="bt l" data-go="card">Открыть карту</button></div>
+<div class="k col"><div class="row sb"><b>Серия визитов</b><span class="m">${st} ${pl(st,["неделя","недели","недель"])} подряд</span></div><div class="row" style="gap:6px">${pills}</div><div class="m">Заходите хотя бы раз в неделю, чтобы не прерывать серию</div></div>
+<div class="k row"><div class="dt"><b>${d.n}</b><span>${d.ms}</span></div><div style="flex:1"><b>${ev.title}</b><div class="m">${ev.tag?ev.tag+" · ":""}${ev.time}${b?" · вы записаны":""}</div></div><button class="bt" style="width:auto;padding:0 16px;height:44px" data-go="events">${b?"Моя запись":"Запись"}</button></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><button class="k" style="text-align:left" data-go="menu"><b>Меню</b><div class="m" style="margin-top:4px">Кофе и обеды</div></button><button class="k" style="text-align:left" data-sub="route"><b>Как нас найти</b><div class="m" style="margin-top:4px">Маршрут в Яндекс Картах</div></button></div>`},
+card:()=>{const c=pos(),h=DB.hist.slice(0,4).map(x=>`<div class="row sb" style="padding:10px 0;border-top:1px solid var(--bd)"><span style="font-size:14px">${x.n}</span><span class="m">${x.d}</span></div>`).join("");
+return `<h1 class="h">Карта</h1><div class="k col"><div class="row sb"><b>Собираем кружки</b><span class="m">${c} из ${CUPS_MAX}</span></div>
+<div role="img" aria-label="Собрано ${c} кружек из ${CUPS_MAX}" style="display:grid;grid-template-columns:repeat(5,48px);justify-content:space-between;gap:12px 0">${Array.from({length:15},(_,i)=>cell(i+1,c)).join("")}</div>
+<div class="m" style="line-height:1.6">5 кружек — конфета<br>10 кружек — круассан<br>15 кружек — кофе в подарок</div></div>
+<button class="bt" data-sub="code">Добавить кружку</button>
+<div class="k" style="padding:6px 16px 0"><b style="display:block;padding:10px 0">Последние кружки</b>${h||'<div class="m" style="padding-bottom:14px">Пока пусто. Добавьте код с чека.</div>'}</div>`},
+code:()=>`${top("Добавить кружку")}<div class="m" style="line-height:1.5">На каждом чеке свой одноразовый код. Отсканируйте QR или введите код вручную.</div>
+${S.msg?`<div class="msg ${S.msg[0]==="bad"?"bad":""}" role="status">${S.msg[1]}</div>`:""}
+<button class="bt" data-act="scan">Сканировать QR на чеке</button><div class="m" style="text-align:center">или введите код вручную</div>
+<input id="code" class="fi" aria-label="Код с чека" placeholder="TR-0000-00" value="${esc(S.code)}" autocomplete="off" autocapitalize="characters">
+<button class="bt o" style="height:52px" data-act="addcode">Добавить кружку</button>
+<div class="k m" style="line-height:1.6">Для теста: ${VALID.join(", ")}</div>`,
+events:()=>`<div><h1 class="h">Вечера</h1><div class="m" style="margin-top:6px">Живая музыка в Терапии. Нужна запись, мест немного.</div></div>${EVENTS.map(evCard).join("")}`,
+seats:()=>{const e=EVENTS.find(x=>x.id===S.p),d=dd(e.date),n=S.sel.length;
+return `${top("Выбор мест")}<div class="dk" style="padding:12px 16px"><b>${e.title}${e.tag?" · "+e.tag.toLowerCase():""}</b><div class="m">${d.w}, ${d.n} ${d.m} · ${e.time}</div></div>${mapSvg(e)}
+<div class="row sb">${lg("f","Свободно")}${lg("o","Занято")}${lg("s","Ваш выбор")}</div>
+<div class="k row sb" style="padding:12px 16px"><div><b>${n?"Выбрано: "+n+" "+pl(n,["место","места","мест"]):"Выберите места"}</b><div class="m">Можно до 6 мест</div></div>${n?'<button class="ch" data-act="clear">Сбросить</button>':""}</div>
+<button class="bt" style="height:52px;font-size:16px" data-act="book" ${n?"":"disabled"}>${n?"Забронировать "+n+" "+pl(n,["место","места","мест"]):"Забронировать"}</button>`},
+done:()=>{const e=EVENTS.find(x=>x.id===S.p),d=dd(e.date),b=DB.book[e.id]||[];
+return `<h1 class="h">Вы записаны</h1><div class="dk"><b style="font-size:17px">${e.title}</b><div class="m" style="margin-top:4px">${d.w}, ${d.n} ${d.m} · ${e.time}</div><div class="m">Мест: ${b.length} (${b.map(x=>"стол "+x[0]).filter((v,i,a)=>a.indexOf(v)===i).join(", ")})</div></div>
+<div class="m" style="line-height:1.5">Если планы изменятся, отмените запись, чтобы места достались другим.</div><button class="bt" data-sub="route">Как добраться</button><button class="bt o" data-act="back">Готово</button><button class="bt o" style="border-color:var(--bd2);color:var(--mu)" data-act="cancel">Отменить запись</button>`},
+menu:()=>`<h1 class="h">Меню</h1><div class="row" style="gap:8px">${Object.keys(MENU).map(k=>`<button class="ch ${k===S.cat?"on":""}" data-act="cat" data-p="${k}">${k}</button>`).join("")}</div>
+<div class="k" style="padding:2px 16px">${MENU[S.cat].map((x,i)=>`<div class="row" style="padding:12px 0;${i?"border-top:1px solid var(--bd);":""}align-items:flex-start"><div class="ph">${ic(CUP,24)}<span>фото</span></div><div style="flex:1"><div class="row sb"><b>${x[0]}</b><b style="color:var(--ac);font-size:14px">${x[2]}</b></div><div class="m" style="margin-top:4px;line-height:1.4">${x[1]}</div></div></div>`).join("")}</div>
+<div class="k row sb" style="border-style:dashed"><div><b style="font-size:14px">Заказ у стойки</b><div class="m">Доставка через Яндекс Еду — скоро</div></div><span class="ch">Скоро</span></div>`,
+route:()=>`${top("Как нас найти")}<svg width="100%" viewBox="0 0 358 200" role="img" aria-label="Схема района с отметкой кофейни"><rect width="358" height="200" rx="20" fill="#EBD9C5"/><path d="M0 60L358 90M0 150L358 130M110 0L140 200M250 0L230 200" stroke="#FFFAF4" stroke-width="12"/><path d="M179 118c-14-17-22-26-22-36a22 22 0 0 1 44 0c0 10-8 19-22 36z" fill="#4A1E1B"/><circle cx="179" cy="82" r="8" fill="#F6EFE6"/></svg>
+<div class="k col" style="gap:6px"><b>Туровского, 24, пом. 209</b><div class="m">Минск · МАЯК МИНСКА</div><div class="m">С 7:30 свежие круассаны, открыто до 22:00</div></div>
+<div class="row" style="gap:8px">${[["pd","Пешком"],["auto","На авто"],["mt","Транспорт"]].map(x=>`<button class="ch ${S.rtt===x[0]?"on":""}" data-act="rtt" data-p="${x[0]}">${x[1]}</button>`).join("")}</div>
+<button class="bt" style="height:52px;font-size:16px" data-act="route">Построить маршрут в Яндекс Картах</button><button class="bt o" data-act="map">Открыть на карте</button><button class="bt o" style="border-color:var(--bd2);color:var(--mu)" data-act="copy">Скопировать адрес</button>`
+};
+
+/* ===== Навигация и отрисовка ===== */
+let lastKey="";
+function render(){const v=$("#view"),key=S.tab+"|"+S.sub;
+v.innerHTML=V[S.sub||S.tab]();v.classList.toggle("sub",!!S.sub);
+if(key!==lastKey){v.classList.remove("go");void v.offsetWidth;v.classList.add("go");window.scrollTo(0,0);lastKey=key}
+const tb=$("#tabs");tb.style.display=S.sub?"none":"flex";
+tb.innerHTML=TABS.map(t=>`<button class="${t[0]===S.tab?"on":""}" data-go="${t[0]}">${ic(t[2])}${t[1]}</button>`).join("");
+if(inTg){S.sub?tg.BackButton.show():tg.BackButton.hide()}}
+function back(){if(S.sub==="seats"||S.sub==="done"||S.sub==="code"||S.sub==="route"){S.sub=null;S.sel=[];S.msg=null}else S.tab="home"}
+document.addEventListener("click",e=>{
+const sx=e.target.closest("[data-seat]");
+if(sx){if(sx.dataset.st==="o")return;const id=sx.dataset.seat,i=S.sel.indexOf(id);if(i>=0)S.sel.splice(i,1);else if(S.sel.length<6)S.sel.push(id);hap();render();return}
+const t=e.target.closest("[data-go],[data-act],[data-sub]");if(!t)return;hap();const d=t.dataset,a=d.act;
+if(d.go){S.tab=d.go;S.sub=null}
+else if(d.sub){S.sub=d.sub;S.msg=null}
+else if(a==="back")back();
+else if(a==="ev"){S.p=d.p;S.sel=(DB.book[d.p]||[]).slice();S.sub="seats"}
+else if(a==="clear")S.sel=[];
+else if(a==="book"){DB.book[S.p]=S.sel.slice();save();hap("success");S.sub="done"}
+else if(a==="cancel"){delete DB.book[S.p];save();S.sub=null}
+else if(a==="wait"){DB.wait[d.p]=1;save()}
+else if(a==="cat")S.cat=d.p;
+else if(a==="rtt")S.rtt=d.p;
+else if(a==="route")open("https://yandex.ru/maps/?rtext=~"+encodeURIComponent(ADDR)+"&rtt="+S.rtt);
+else if(a==="map")open("https://yandex.ru/maps/?text="+encodeURIComponent(ADDR));
+else if(a==="copy"){try{navigator.clipboard.writeText(ADDR);if(inTg)tg.showAlert("Адрес скопирован")}catch(x){}return}
+else if(a==="addcode"){S.code=$("#code").value;S.msg=addCode(S.code);if(S.msg[0]==="ok")S.code="";else hap("error")}
+else if(a==="scan"){if(inTg&&tg.showScanQrPopup){tg.showScanQrPopup({text:"Наведите на QR с чека"},txt=>{const m=String(txt).toUpperCase().match(/TR-[A-Z0-9]{4}-[0-9]{2}/);S.msg=addCode(m?m[0]:txt);render();return true})}else{S.msg=["bad","Сканер доступен только внутри Telegram. Введите код вручную"]}}
+render()});
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset&&e.target.dataset.seat){e.preventDefault();e.target.dispatchEvent(new MouseEvent("click",{bubbles:true}))}});
+/* Запрет масштабирования */
+["gesturestart","gesturechange","gestureend"].forEach(n=>document.addEventListener(n,e=>e.preventDefault()));
+document.addEventListener("touchmove",e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
+document.addEventListener("wheel",e=>{if(e.ctrlKey)e.preventDefault()},{passive:false});
+if(inTg)tg.BackButton.onClick(()=>{back();render()});
+render();
+</script>
+</body>
+</html>
