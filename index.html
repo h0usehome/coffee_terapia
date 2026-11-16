@@ -49,6 +49,28 @@ button:active:not(:disabled){transform:scale(.96)}
 .pb b{font-size:15px;line-height:1.25}
 .pb .m{font-size:12px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .pa{margin-top:auto;padding-top:8px;font-weight:800;font-size:15px;color:var(--ac)}
+#view.hm{padding:24px 16px 12px;gap:10px}
+.hm .col{gap:8px}
+.hm .ib{width:40px;height:40px}
+.hm .dk{padding:14px;border-radius:22px}
+.hm .dk .bt{height:44px}
+.hm .k{padding:12px;border-radius:18px}
+.hm .pill{height:26px}
+.hm .dt{width:48px;height:52px;border-radius:14px}
+.hm .dt b{font-size:18px}
+.hm .evb{width:auto;height:40px;padding:0 14px;font-size:14px}
+.ch.s{padding:4px 10px;font-size:12px}
+.hint{font-size:12px}
+@media (max-height:640px){
+#view.hm{padding-top:20px;gap:8px}
+.hint{display:none}
+.hm .dk{padding:12px}
+.hm .dk .bt{height:40px}
+.hm .k{padding:10px 12px}
+.hm .pill{height:20px}
+.hm .dt{width:44px;height:46px}
+.hm .evb{height:36px}
+}
 @keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes grow{from{width:0}}
 .anim{animation:in .32s cubic-bezier(.2,.7,.2,1)}.anim .bar i{animation:grow .7s cubic-bezier(.2,.7,.2,1)}
@@ -114,7 +136,7 @@ const p=pos();return["ok","Кружка добавлена: "+p+" из "+CUPS_MA
 /* ===== Экраны ===== */
 let S={tab:"home",sub:null,p:null,sel:[],cat:"Кофе",rtt:"pd",msg:null,code:""};
 const hdr=(t)=>`<div class="row"><button class="ch ib" data-act="back" aria-label="Назад">${ic('<path d="M15 5l-7 7 7 7"/>')}</button><h1 class="h" style="font-size:20px">${t}</h1></div>`;
-const mark=`<div><div style="font-family:Unbounded,sans-serif;font-weight:600;font-size:22px;letter-spacing:.06em;color:var(--br)">терапия</div><div style="font-size:11px;letter-spacing:.12em;color:var(--mu)">место вкуса и встреч</div></div>`;
+const mark=`<div><div style="font-family:Unbounded,sans-serif;font-weight:600;font-size:20px;line-height:1.15;letter-spacing:.06em;color:var(--br)">терапия</div><div style="font-size:11px;line-height:1.3;letter-spacing:.12em;color:var(--mu)">место вкуса и встреч</div></div>`;
 const cell=(n,c)=>n===5?`<div class="cell ${c>=5?"g":"go"}">${ic(CANDY)}</div>`:n===10?`<div class="cell ${c>=10?"g":"go"}">${ic(CROI)}</div>`:n===15?`<div class="cell ${c>=15?"g":"go"}">${ic(CUP)}</div>`:n<=c?`<div class="cell f">${ic(CUP,20)}</div>`:`<div class="cell e"></div>`;
 const sg=(x,y,s)=>s==="o"?`<circle cx="${x}" cy="${y}" r="12" style="fill:var(--tbl);stroke:var(--dash)" stroke-width="1.5"/><path d="M${x-4} ${y-4}l8 8m0-8l-8 8" style="stroke:var(--mu)" stroke-width="1.8" stroke-linecap="round"/>`:s==="s"?`<circle cx="${x}" cy="${y}" r="12" style="fill:var(--br)"/><path d="M${x-5} ${y}l3.5 3.5 6.5-7" style="stroke:var(--onbr)" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:`<circle cx="${x}" cy="${y}" r="12" style="fill:var(--card);stroke:var(--seat)" stroke-width="1.5"/>`;
 const PD={N:[0,-30],E:[30,0],S:[0,30],W:[-30,0]};
@@ -132,12 +154,12 @@ const prod=(x,cat)=>`<article class="pr"><div class="pp">${x[3]?`<img src="${esc
 const V={
 home:()=>{const c=pos(),nx=c<5?5:c<10?10:c<15?15:5,l=nx-c,u=inTg&&tg.initDataUnsafe&&tg.initDataUnsafe.user,st=streak(),ev=nextEv(),d=dd(ev.date),b=DB.book[ev.id],cw=widx(day());
 const w=new Set(DB.visits.map(widx)),pills=[5,4,3,2,1,0].map(i=>w.has(cw-i)?`<div class="pill f">${ic(CHECK,16,3)}</div>`:`<div class="pill e"></div>`).join("");
-return `<div class="row sb">${mark}<span class="ch">Открыто до 22:00</span></div>
-<div class="row sb"><div class="m">Привет${u&&u.first_name?", "+esc(u.first_name):""}!</div><button class="ch ib" data-act="theme" aria-label="${theme==="dark"?"Светлая тема":"Тёмная тема"}">${ic(theme==="dark"?SUN:MOON,20)}</button></div>
+return `<div class="row sb">${mark}<button class="ch ib" data-act="theme" aria-label="${theme==="dark"?"Светлая тема":"Тёмная тема"}">${ic(theme==="dark"?SUN:MOON,20)}</button></div>
+<div class="row sb"><div class="m">Привет${u&&u.first_name?", "+esc(u.first_name):""}!</div><span class="ch s">Открыто до 22:00</span></div>
 <div class="dk col"><div class="row sb"><b style="font-size:16px">Ваша карта</b><span class="m">${c} из ${CUPS_MAX} кружек</span></div><div class="bar"><i style="width:${c/CUPS_MAX*100}%"></i></div>
 <div>${!DB.cups?"Первая кружка ждёт вас":c===15?"Карта заполнена: заберите кофе в подарок":`Ещё ${l} ${pl(l,["кружка","кружки","кружек"])} — и награда: ${REW[nx]}`}</div><button class="bt l" data-go="card">Открыть карту</button></div>
-<div class="k col"><div class="row sb"><b>Серия визитов</b><span class="m">${st} ${pl(st,["неделя","недели","недель"])} подряд</span></div><div class="row" style="gap:6px">${pills}</div><div class="m">Заходите хотя бы раз в неделю, чтобы не прерывать серию</div></div>
-<div class="k row"><div class="dt"><b>${d.n}</b><span>${d.ms}</span></div><div style="flex:1"><b>${ev.title}</b><div class="m">${ev.tag?ev.tag+" · ":""}${ev.time}${b?" · вы записаны":""}</div></div><button class="bt" style="width:auto;padding:0 16px;height:44px" data-go="events">${b?"Моя запись":"Запись"}</button></div>
+<div class="k col"><div class="row sb"><b>Серия визитов</b><span class="m">${st} ${pl(st,["неделя","недели","недель"])} подряд</span></div><div class="row" style="gap:6px">${pills}</div><div class="m hint">Заходите раз в неделю — серия не прервётся</div></div>
+<div class="k row"><div class="dt"><b>${d.n}</b><span>${d.ms}</span></div><div style="flex:1"><b>${ev.title}</b><div class="m">${ev.tag?ev.tag+" · ":""}${ev.time}${b?" · вы записаны":""}</div></div><button class="bt evb" data-go="events">${b?"Моя запись":"Запись"}</button></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><button class="k" style="text-align:left" data-go="menu"><b>Меню</b><div class="m" style="margin-top:4px">Кофе и обеды</div></button><button class="k" style="text-align:left" data-sub="route"><b>Как нас найти</b><div class="m" style="margin-top:4px">Маршрут в Яндекс Картах</div></button></div>`},
 card:()=>{const c=pos(),h=DB.hist.slice(0,4).map(x=>`<div class="row sb" style="padding:10px 0;border-top:1px solid var(--bd)"><span style="font-size:14px">${x.n}</span><span class="m">${x.d}</span></div>`).join("");
 return `<h1 class="h">Карта</h1><div class="k col"><div class="row sb"><b>Собираем кружки</b><span class="m">${c} из ${CUPS_MAX}</span></div>
@@ -172,7 +194,7 @@ route:()=>`${hdr("Как нас найти")}<svg width="100%" viewBox="0 0 358 
 /* ===== Навигация и отрисовка ===== */
 let lastKey="";
 function render(){const v=$("#view"),key=S.tab+"|"+S.sub,st=v.scrollTop;
-v.innerHTML=V[S.sub||S.tab]();v.classList.toggle("sub",!!S.sub);
+v.innerHTML=V[S.sub||S.tab]();v.classList.toggle("sub",!!S.sub);v.classList.toggle("hm",!S.sub&&S.tab==="home");
 if(key!==lastKey){v.classList.remove("anim");void v.offsetWidth;v.classList.add("anim");v.scrollTop=0;lastKey=key}else v.scrollTop=st;
 const tb=$("#tabs");tb.style.display=S.sub?"none":"flex";
 tb.innerHTML=TABS.map(t=>`<button class="${t[0]===S.tab?"on":""}" data-go="${t[0]}">${ic(t[2])}${t[1]}</button>`).join("");
