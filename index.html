@@ -7,45 +7,57 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#F6EFE6;--card:#FFFAF4;--bd:#E5D6C6;--bd2:#D9C5B2;--ink:#3A1613;--mu:#7A5F57;--br:#4A1E1B;--ac:#B4531A;--ok:#2F7D4F}
+:root{--bg:#F6EFE6;--card:#FFFAF4;--bd:#E5D6C6;--bd2:#D9C5B2;--ink:#3A1613;--mu:#7A5F57;--br:#4A1E1B;--on:#F6EFE6;--ac:#B4531A;--onac:#fff;--ok:#2F7D4F;--dash:#C9B3A0;--ph:#EBD9C5;--okbg:#E7F1EA;--okt:#1F5A38;--badbg:#F8E4DD;--badt:#8A2E12;--dkbg:#4A1E1B;--fade:rgba(246,239,230,0)}
+:root[data-theme=dark]{--bg:#1A1311;--card:#261B18;--bd:#3A2B26;--bd2:#4C3B34;--ink:#F3E9DF;--mu:#B7A398;--br:#E6BE94;--on:#2A1512;--ac:#E58C4A;--onac:#2A1512;--ok:#5FBF86;--dash:#6A574E;--ph:#33261F;--okbg:#1E3327;--okt:#9AD9B1;--badbg:#3B2019;--badt:#F2A98F;--dkbg:#4A1E1B;--fade:rgba(26,19,17,0)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Manrope,system-ui,sans-serif;touch-action:manipulation;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
 button,input{font-family:inherit}
 button{color:inherit;cursor:pointer;transition:transform .12s ease,background-color .2s,opacity .2s}
 button:active:not(:disabled){transform:scale(.96)}
 #app{max-width:480px;min-height:100vh;min-height:100dvh;margin:0 auto}
-#view{padding:24px 16px 96px;display:flex;flex-direction:column;gap:14px}
-#view.sub{padding-bottom:24px}
+#view{padding:calc(24px + env(safe-area-inset-top)) 16px calc(112px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:20px}
+#view.sub{padding-bottom:calc(32px + env(safe-area-inset-bottom))}
+.sec{display:flex;flex-direction:column;gap:12px}.sec>.st{font-family:Unbounded,sans-serif;font-weight:600;font-size:15px;margin:0}
 .h{font-family:Unbounded,sans-serif;font-weight:600;font-size:22px;margin:0;line-height:1.2}
-.k{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:16px}
-.dk{background:var(--br);color:#F6EFE6;border-radius:24px;padding:18px}
+.k{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:18px}
+.dk{background:var(--dkbg);color:#F6EFE6;border-radius:24px;padding:20px}
 .m{font-size:13px;color:var(--mu)}.dk .m{color:#E3CDBF}
-.row{display:flex;align-items:center;gap:12px}.sb{justify-content:space-between}.col{display:flex;flex-direction:column;gap:12px}
-.bt{height:48px;border:0;border-radius:14px;background:var(--br);color:#F6EFE6;font-weight:700;font-size:15px;padding:0 20px;width:100%}
-.bt.l{background:#F6EFE6;color:var(--br)}.bt.o{background:none;color:var(--br);border:1.5px solid var(--br)}.bt:disabled{opacity:.4}
+.row{display:flex;align-items:center;gap:12px}.sb{justify-content:space-between}.col{display:flex;flex-direction:column;gap:14px}
+.bt{height:48px;border:0;border-radius:14px;background:var(--br);color:var(--on);font-weight:700;font-size:15px;padding:0 20px;width:100%}
+.bt.l{background:#F6EFE6;color:#4A1E1B}.bt.o{background:none;color:var(--br);border:1.5px solid var(--br)}.bt:disabled{opacity:.4}
 .ch{padding:8px 14px;border-radius:999px;border:1px solid var(--bd2);background:var(--card);font-weight:600;font-size:13px;white-space:nowrap}
-.ch.on{background:var(--br);color:#F6EFE6;border-color:var(--br)}
+.ch.on{background:var(--br);color:var(--on);border-color:var(--br)}
 .ib{width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center}
 .bar{height:8px;border-radius:4px;background:#6E3D37;overflow:hidden}.bar i{display:block;height:100%;background:#F2B26B}
-.t{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:72px;padding-bottom:env(safe-area-inset-bottom);box-sizing:content-box;background:var(--card);border-top:1px solid var(--bd);display:flex}
+.t{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:68px;z-index:10;padding-bottom:env(safe-area-inset-bottom);box-sizing:content-box;background:var(--card);border-top:1px solid var(--bd);display:flex}
 .t button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:600;color:var(--mu)}
 .t button.on{color:var(--br);font-weight:800}
+.t button{min-width:0}
+.hc{width:56px;height:56px;border-radius:50%;margin-top:-28px;background:var(--card);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;color:var(--br);box-shadow:0 4px 14px rgba(58,22,19,.18);transition:transform .15s,background-color .2s}
+.hb.on .hc{background:var(--br);color:var(--on);border-color:var(--br)}.hb:active .hc{transform:scale(.92)}
+.tgl{width:52px;height:32px;border-radius:16px;border:1px solid var(--bd2);background:var(--bd);position:relative;flex:none;padding:0}
+.tgl i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--card);transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.tgl.on{background:var(--ac);border-color:var(--ac)}.tgl.on i{transform:translateX(20px)}
+.seg{display:flex;gap:6px;background:var(--bg);border:1px solid var(--bd);border-radius:14px;padding:4px}.seg button{flex:1;border:0;border-radius:10px;background:none;min-height:40px;font-weight:600;font-size:13px}.seg button.on{background:var(--br);color:var(--on)}
+.stat{display:flex;flex-direction:column;gap:6px;min-height:96px;justify-content:center}.stat b{font-family:Unbounded,sans-serif;font-size:26px;line-height:1}
+.av{width:64px;height:64px;border-radius:50%;background:var(--br);color:var(--on);font-family:Unbounded,sans-serif;font-weight:600;font-size:26px;display:flex;align-items:center;justify-content:center;flex:none}
+.noanim *,.noanim *::before{animation:none!important;transition:none!important}
 .cell{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.f{background:var(--br);color:#F6EFE6}.e{border:1.5px dashed #C9B3A0}.g{background:var(--ac);color:#fff}.go{border:2px solid var(--ac);color:var(--ac)}
-.pill{height:34px;flex:1;border-radius:10px;display:flex;align-items:center;justify-content:center}
-.dt{width:56px;height:60px;border-radius:16px;background:var(--br);color:#F6EFE6;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none}
+.f{background:var(--br);color:var(--on)}.e{border:1.5px dashed var(--dash)}.g{background:var(--ac);color:var(--onac)}.go{border:2px solid var(--ac);color:var(--ac)}
+.pill{height:38px;flex:1;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.dt{width:56px;height:60px;border-radius:16px;background:var(--br);color:var(--on);display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none}
 .dt b{font-family:Unbounded,sans-serif;font-size:20px;line-height:1}.dt span{font-size:11px;margin-top:4px}
 .fi{width:100%;height:48px;border:1px solid var(--bd2);border-radius:14px;background:var(--card);padding:0 14px;font:500 16px Manrope,sans-serif;color:var(--ink);text-align:center;letter-spacing:.1em;font-weight:700}
-.ph{background:#EBD9C5;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--mu);font-size:10px;flex:none;width:76px;height:76px;object-fit:cover}
-.msg{padding:12px 16px;border-radius:14px;background:#E7F1EA;color:#1F5A38;font-weight:600;font-size:14px}.msg.bad{background:#F8E4DD;color:#8A2E12}
+.ph{background:var(--ph);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--mu);font-size:10px;flex:none;width:76px;height:76px;object-fit:cover}
+.msg{padding:14px 16px;border-radius:14px;background:var(--okbg);color:var(--okt);font-weight:600;font-size:14px}.msg.bad{background:var(--badbg);color:var(--badt)}
 .ch{min-height:40px}
 .lb{font-size:13px;font-weight:700;margin-bottom:6px;display:block}
 .fl{width:100%;border:1px solid var(--bd2);border-radius:14px;background:var(--card);padding:12px 14px;font:500 16px Manrope,sans-serif;color:var(--ink)}
 textarea.fl{resize:vertical;line-height:1.5}
 .hs{overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}.hs::-webkit-scrollbar{display:none}.hs>*{flex:none}
-.nc{width:260px;text-align:left;scroll-snap-align:start}
+.nc{width:270px;text-align:left;scroll-snap-align:start}
 .nt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.sticky{position:sticky;bottom:0;margin:8px -16px 0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(rgba(246,239,230,0),var(--bg) 35%);z-index:5}
+.sticky{position:sticky;bottom:0;margin:8px -16px 0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(var(--fade),var(--bg) 35%);z-index:5}
 @keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes grow{from{width:0}}
 .go{animation:in .32s cubic-bezier(.2,.7,.2,1)}.go .bar i{animation:grow .7s cubic-bezier(.2,.7,.2,1)}
@@ -71,7 +83,7 @@ let EVENTS=[{id:"e1",date:"2026-11-19",title:"Музыкальный вечер"
 
 /* ===== Утилиты ===== */
 const tg=window.Telegram&&window.Telegram.WebApp,inTg=!!(tg&&tg.initData),$=s=>document.querySelector(s);
-if(inTg){tg.ready();tg.expand();tg.setHeaderColor("#F6EFE6");tg.setBackgroundColor("#F6EFE6");}
+if(inTg){tg.ready();tg.expand();}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const LS={g(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const DB=Object.assign({cups:0,hist:[],used:[],visits:[],book:{},wait:{}},LS.g("tdb",{}));
@@ -80,14 +92,20 @@ const save=()=>LS.s("tdb",DB);
 let NEWS=[{id:"n1",title:"Музыкальный вечер 19 ноября",text:"Живая музыка в кофейне. Места ограничены, запишитесь заранее в разделе «Вечера».",date:"2026-11-16",pin:1},{id:"n2",title:"Обеды с 12:00",text:"Полезная тарелка по будням с 12:00, пока не съедят.",date:"2026-11-10",pin:0},{id:"n3",title:"Осенние напитки",text:"Загляните за сезонными напитками. Подробности скоро.",date:"2026-11-03",pin:0}];
 {const c=LS.g("tct",null);if(c){MENU=c.menu;EVENTS=c.events;NEWS=c.news}}
 const saveCT=()=>LS.s("tct",{menu:MENU,events:EVENTS,news:NEWS});
-const hap=k=>{try{if(inTg){k?tg.HapticFeedback.notificationOccurred(k):tg.HapticFeedback.impactOccurred("light")}else if(navigator.vibrate)navigator.vibrate(k?[15,30,15]:10)}catch(e){}};
+const hap=k=>{if(!CFG.haptic)return;try{if(inTg){k?tg.HapticFeedback.notificationOccurred(k):tg.HapticFeedback.impactOccurred("light")}else if(navigator.vibrate)navigator.vibrate(k?[15,30,15]:10)}catch(e){}};
+const CFG=Object.assign({theme:"auto",haptic:1,anim:1},LS.g("tcfg",{}));
+const PAL={light:{bd:"#E5D6C6",dash:"#C9B3A0",mu:"#7A5F57",br:"#4A1E1B",on:"#F6EFE6",card:"#FFFAF4",ink:"#3A1613",ph:"#EBD9C5"},dark:{bd:"#3A2B26",dash:"#6A574E",mu:"#B7A398",br:"#E6BE94",on:"#2A1512",card:"#261B18",ink:"#F3E9DF",ph:"#33261F"}};
+let K=PAL.light,THEME="light";
+function applyTheme(){const dark=CFG.theme==="dark"||(CFG.theme==="auto"&&(inTg&&tg.colorScheme?tg.colorScheme==="dark":window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches));
+THEME=dark?"dark":"light";K=PAL[THEME];document.documentElement.setAttribute("data-theme",THEME);document.body.classList.toggle("noanim",!CFG.anim);
+if(inTg){const c=dark?"#1A1311":"#F6EFE6";try{tg.setHeaderColor(c);tg.setBackgroundColor(c);tg.setBottomBarColor&&tg.setBottomBarColor(dark?"#261B18":"#FFFAF4")}catch(e){}}}
 const day=()=>new Date().toISOString().slice(0,10),widx=d=>Math.floor((Date.parse(d)/864e5+3)/7);
 const pl=(n,a)=>{const m=n%100,k=n%10;return a[m>10&&m<20?2:k===1?0:k>1&&k<5?1:2]};
 const WD=["вс","пн","вт","ср","чт","пт","сб"],MG=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
 const dd=s=>{const d=new Date(s+"T12:00:00");return{n:d.getDate(),m:MG[d.getMonth()],ms:MG[d.getMonth()].slice(0,3),w:WD[d.getDay()]}};
 const ic=(p,s=22,w=2)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const CUP='<path d="M5 9h11v4a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5zM16 10h2a2 2 0 0 1 0 4h-2"/>',CANDY='<circle cx="12" cy="12" r="4"/><path d="M8 12L3 9v6zM16 12l5-3v6z"/>',CROI='<path d="M3 16c1-6 5-9 9-9s8 3 9 9c-2-1-3-3-4-5l-2 2-3-4-3 4-2-2c-1 2-2 4-4 5z"/>',CHECK='<path d="M5 12l5 5 9-10"/>';
-const TABS=[["home","Главная",'<path d="M3 11l9-8 9 8v10H3z"/>'],["card","Карта",'<rect x="3" y="6" width="18" height="12" rx="3"/><path d="M3 10h18"/>'],["events","Вечера",'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/>'],["menu","Меню",CUP]];
+const TABS=[["menu","Меню",CUP],["events","Вечера",'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/>'],["home","Главная",'<path d="M3 11l9-8 9 8v10H3z"/>'],["card","Карта",'<rect x="3" y="6" width="18" height="12" rx="3"/><path d="M3 10h18"/>'],["profile","Профиль",'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 15-5 16 0"/>']];
 const open=u=>{try{inTg?tg.openLink(u):window.open(u,"_blank")}catch(e){window.open(u,"_blank")}};
 
 /* ===== Данные ===== */
@@ -108,13 +126,13 @@ let S={tab:"home",sub:null,p:null,sel:[],cat:"Кофе",rtt:"pd",msg:null,code:"
 const hdr=(t)=>`<div class="row"><button class="ch ib" data-act="back" aria-label="Назад">${ic('<path d="M15 5l-7 7 7 7"/>')}</button><h1 class="h" style="font-size:20px">${t}</h1></div>`;
 const mark=`<div><div style="font-family:Unbounded,sans-serif;font-weight:600;font-size:22px;letter-spacing:.06em;color:var(--br)">терапия</div><div style="font-size:11px;letter-spacing:.12em;color:var(--mu)">место вкуса и встреч</div></div>`;
 const cell=(n,c)=>n===5?`<div class="cell ${c>=5?"g":"go"}">${ic(CANDY)}</div>`:n===10?`<div class="cell ${c>=10?"g":"go"}">${ic(CROI)}</div>`:n===15?`<div class="cell ${c>=15?"g":"go"}">${ic(CUP)}</div>`:n<=c?`<div class="cell f">${ic(CUP,20)}</div>`:`<div class="cell e"></div>`;
-const sg=(x,y,s)=>s==="o"?`<circle cx="${x}" cy="${y}" r="12" fill="#E5D6C6" stroke="#C9B3A0" stroke-width="1.5"/><path d="M${x-4} ${y-4}l8 8m0-8l-8 8" stroke="#7A5F57" stroke-width="1.8" stroke-linecap="round"/>`:s==="s"?`<circle cx="${x}" cy="${y}" r="12" fill="#4A1E1B"/><path d="M${x-5} ${y}l3.5 3.5 6.5-7" stroke="#F6EFE6" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:`<circle cx="${x}" cy="${y}" r="12" fill="#FFFAF4" stroke="#B9A18F" stroke-width="1.5"/>`;
+const sg=(x,y,s)=>s==="o"?`<circle cx="${x}" cy="${y}" r="12" fill="${K.bd}" stroke="${K.dash}" stroke-width="1.5"/><path d="M${x-4} ${y-4}l8 8m0-8l-8 8" stroke="${K.mu}" stroke-width="1.8" stroke-linecap="round"/>`:s==="s"?`<circle cx="${x}" cy="${y}" r="12" fill="${K.br}"/><path d="M${x-5} ${y}l3.5 3.5 6.5-7" stroke="${K.on}" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:`<circle cx="${x}" cy="${y}" r="12" fill="${K.card}" stroke="${K.dash}" stroke-width="1.5"/>`;
 const PD={N:[0,-30],E:[30,0],S:[0,30],W:[-30,0]};
 function mapSvg(e){const o=new Set(taken(e));let g="";
-TABLES.forEach(([n,cx,cy,ps])=>{g+=`<circle cx="${cx}" cy="${cy}" r="18" fill="#E5D6C6"/><text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="13" font-weight="700" fill="#3A1613">${n}</text>`;
+TABLES.forEach(([n,cx,cy,ps])=>{g+=`<circle cx="${cx}" cy="${cy}" r="18" fill="${K.bd}"/><text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="13" font-weight="700" fill="${K.ink}">${n}</text>`;
 [...ps].forEach((p,i)=>{const id=n+p,x=cx+PD[p][0],y=cy+PD[p][1],st=S.sel.includes(id)?"s":o.has(id)?"o":"f";
 g+=`<g data-seat="${id}" data-st="${st}" role="button" tabindex="0" aria-label="Стол ${n}, место ${i+1}, ${st==="s"?"выбрано":st==="o"?"занято":"свободно"}"><circle cx="${x}" cy="${y}" r="21" fill="transparent"/>${sg(x,y,st)}</g>`})});
-return `<svg viewBox="0 0 358 340" width="100%"><rect x="1" y="1" width="356" height="338" rx="22" fill="#FFFAF4" stroke="#E5D6C6"/><rect x="119" y="14" width="120" height="34" rx="10" fill="#4A1E1B"/><text x="179" y="35" text-anchor="middle" font-size="11" font-weight="700" fill="#F6EFE6">Сцена · пианино</text>${g}<text x="179" y="324" text-anchor="middle" font-size="11" font-weight="700" fill="#7A5F57">ВХОД</text></svg>`}
+return `<svg viewBox="0 0 358 340" width="100%"><rect x="1" y="1" width="356" height="338" rx="22" fill="${K.card}" stroke="${K.bd}"/><rect x="119" y="14" width="120" height="34" rx="10" fill="${K.br}"/><text x="179" y="35" text-anchor="middle" font-size="11" font-weight="700" fill="${K.on}">Сцена · пианино</text>${g}<text x="179" y="324" text-anchor="middle" font-size="11" font-weight="700" fill="${K.mu}">ВХОД</text></svg>`}
 const lg=(s,t)=>`<div class="row" style="gap:6px"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">${sg(12,12,s)}</svg><span class="m">${t}</span></div>`;
 function evCard(e){const d=dd(e.date),b=DB.book[e.id],l=left(e);
 const act=b?`<button class="bt o" data-act="ev" data-p="${e.id}">Изменить запись</button>`:l>0?`<button class="bt" data-act="ev" data-p="${e.id}">Записаться</button>`:DB.wait[e.id]?`<button class="bt o" disabled>Вы в листе ожидания</button>`:`<button class="bt o" data-act="wait" data-p="${e.id}">В лист ожидания</button>`;
@@ -124,12 +142,13 @@ const V={
 home:()=>{const c=pos(),nx=c<5?5:c<10?10:c<15?15:5,l=nx-c,u=inTg&&tg.initDataUnsafe&&tg.initDataUnsafe.user,st=streak(),ev=nextEv(),d=dd(ev.date),b=DB.book[ev.id],cw=widx(day());
 const w=new Set(DB.visits.map(widx)),pills=[5,4,3,2,1,0].map(i=>w.has(cw-i)?`<div class="pill f">${ic(CHECK,16,3)}</div>`:`<div class="pill e"></div>`).join("");
 return `<div class="row sb">${mark}<span class="ch">Открыто до 22:00</span></div>
-<div class="m">Привет${u&&u.first_name?", "+esc(u.first_name):""}!</div>${newsBlock()}
+<div class="sec" style="gap:4px"><h1 class="h" style="font-size:24px">Привет${u&&u.first_name?", "+esc(u.first_name):""}!</h1><div class="m" style="font-size:14px">Рады вас видеть в «Терапии»</div></div>
 <div class="dk col"><div class="row sb"><b style="font-size:16px">Ваша карта</b><span class="m">${c} из ${CUPS_MAX} кружек</span></div><div class="bar"><i style="width:${c/CUPS_MAX*100}%"></i></div>
-<div>${!DB.cups?"Первая кружка ждёт вас":c===15?"Карта заполнена: заберите кофе в подарок":`Ещё ${l} ${pl(l,["кружка","кружки","кружек"])} — и награда: ${REW[nx]}`}</div><button class="bt l" data-go="card">Открыть карту</button></div>
-<div class="k col"><div class="row sb"><b>Серия визитов</b><span class="m">${st} ${pl(st,["неделя","недели","недель"])} подряд</span></div><div class="row" style="gap:6px">${pills}</div><div class="m">Заходите хотя бы раз в неделю, чтобы не прерывать серию</div></div>
-<div class="k row"><div class="dt"><b>${d.n}</b><span>${d.ms}</span></div><div style="flex:1"><b>${esc(ev.title)}</b><div class="m">${ev.tag?esc(ev.tag)+" · ":""}${ev.time}${b?" · вы записаны":""}</div></div><button class="bt" style="width:auto;padding:0 16px;height:44px" data-go="events">${b?"Моя запись":"Запись"}</button></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><button class="k" style="text-align:left" data-go="menu"><b>Меню</b><div class="m" style="margin-top:4px">Кофе и обеды</div></button><button class="k" style="text-align:left" data-sub="route"><b>Как нас найти</b><div class="m" style="margin-top:4px">Маршрут в Яндекс Картах</div></button></div>${isAdmin()?'<button class="bt o" data-sub="admin">Панель администратора</button>':""}${inTg&&!ADMINS.length?`<div class="m">Ваш Telegram ID: ${uid()}</div>`:""}`},
+<div style="line-height:1.4">${!DB.cups?"Первая кружка ждёт вас":c===15?"Карта заполнена: заберите кофе в подарок":`Ещё ${l} ${pl(l,["кружка","кружки","кружек"])} — и награда: ${REW[nx]}`}</div><button class="bt l" data-go="card">Открыть карту</button></div>
+${newsBlock()}
+<div class="sec"><h2 class="st">Ближайший вечер</h2><div class="k row"><div class="dt"><b>${d.n}</b><span>${d.ms}</span></div><div style="flex:1;min-width:0"><b>${esc(ev.title)}</b><div class="m" style="margin-top:2px">${ev.tag?esc(ev.tag)+" · ":""}${ev.time}${b?" · вы записаны":""}</div></div><button class="bt" style="width:auto;padding:0 16px;height:44px" data-go="events">${b?"Моя запись":"Запись"}</button></div></div>
+<div class="k col"><div class="row sb"><b>Серия визитов</b><span class="m">${st} ${pl(st,["неделя","недели","недель"])} подряд</span></div><div class="row" style="gap:6px">${pills}</div><div class="m" style="line-height:1.4">Заходите хотя бы раз в неделю, чтобы не прерывать серию</div></div>
+<div class="sec"><h2 class="st">Быстрые ссылки</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><button class="k" style="text-align:left;min-height:84px" data-go="menu"><b>Меню</b><div class="m" style="margin-top:6px">Кофе и обеды</div></button><button class="k" style="text-align:left;min-height:84px" data-sub="route"><b>Как нас найти</b><div class="m" style="margin-top:6px">Маршрут в Яндекс Картах</div></button></div></div>`},
 card:()=>{const c=pos(),h=DB.hist.slice(0,4).map(x=>`<div class="row sb" style="padding:10px 0;border-top:1px solid var(--bd)"><span style="font-size:14px">${x.n}</span><span class="m">${x.d}</span></div>`).join("");
 return `<h1 class="h">Карта</h1><div class="k col"><div class="row sb"><b>Собираем кружки</b><span class="m">${c} из ${CUPS_MAX}</span></div>
 <div role="img" aria-label="Собрано ${c} кружек из ${CUPS_MAX}" style="display:grid;grid-template-columns:repeat(5,48px);justify-content:space-between;gap:12px 0">${Array.from({length:15},(_,i)=>cell(i+1,c)).join("")}</div>
@@ -154,7 +173,7 @@ return `<h1 class="h">Вы записаны</h1><div class="dk"><b style="font-s
 menu:()=>`<h1 class="h">Меню</h1><div class="row hs" style="gap:8px">${Object.keys(MENU).map(k=>`<button class="ch ${k===S.cat?"on":""}" data-act="cat" data-p="${esc(k)}">${esc(k)}</button>`).join("")}</div>
 <div class="k" style="padding:2px 16px">${MENU[S.cat].map((x,i)=>`<div class="row" style="padding:12px 0;${i?"border-top:1px solid var(--bd);":""}align-items:flex-start">${x[3]?`<img class="ph" src="${esc(x[3])}" alt="${esc(x[0])}" loading="lazy">`:`<div class="ph">${ic(CUP,24)}<span>фото</span></div>`}<div style="flex:1"><div class="row sb"><b>${esc(x[0])}</b><b style="color:var(--ac);font-size:14px">${esc(x[2])}</b></div><div class="m" style="margin-top:4px;line-height:1.4">${esc(x[1])}</div></div></div>`).join("")}</div>
 <div class="k row sb" style="border-style:dashed"><div><b style="font-size:14px">Заказ у стойки</b><div class="m">Доставка через Яндекс Еду — скоро</div></div><span class="ch">Скоро</span></div>`,
-route:()=>`${hdr("Как нас найти")}<svg width="100%" viewBox="0 0 358 200" role="img" aria-label="Схема района с отметкой кофейни"><rect width="358" height="200" rx="20" fill="#EBD9C5"/><path d="M0 60L358 90M0 150L358 130M110 0L140 200M250 0L230 200" stroke="#FFFAF4" stroke-width="12"/><path d="M179 118c-14-17-22-26-22-36a22 22 0 0 1 44 0c0 10-8 19-22 36z" fill="#4A1E1B"/><circle cx="179" cy="82" r="8" fill="#F6EFE6"/></svg>
+route:()=>`${hdr("Как нас найти")}<svg width="100%" viewBox="0 0 358 200" role="img" aria-label="Схема района с отметкой кофейни"><rect width="358" height="200" rx="20" fill="${K.ph}"/><path d="M0 60L358 90M0 150L358 130M110 0L140 200M250 0L230 200" stroke="${K.card}" stroke-width="12"/><path d="M179 118c-14-17-22-26-22-36a22 22 0 0 1 44 0c0 10-8 19-22 36z" fill="${K.br}"/><circle cx="179" cy="82" r="8" fill="${K.on}"/></svg>
 <div class="k col" style="gap:6px"><b>Туровского, 24, пом. 209</b><div class="m">Минск · МАЯК МИНСКА</div><div class="m">С 7:30 свежие круассаны, открыто до 22:00</div></div>
 <div class="row" style="gap:8px">${[["pd","Пешком"],["auto","На авто"],["mt","Транспорт"]].map(x=>`<button class="ch ${S.rtt===x[0]?"on":""}" data-act="rtt" data-p="${x[0]}">${x[1]}</button>`).join("")}</div>
 <button class="bt" style="height:52px;font-size:16px" data-act="route">Построить маршрут в Яндекс Картах</button><button class="bt o" data-act="map">Открыть на карте</button><button class="bt o" style="border-color:var(--bd2);color:var(--mu)" data-act="copy">Скопировать адрес</button>`
@@ -166,7 +185,7 @@ const uid=()=>{const u=inTg&&tg.initDataUnsafe&&tg.initDataUnsafe.user;return u?
 const isAdmin=()=>inTg?ADMINS.includes(uid()):location.search.indexOf("admin=1")>=0;
 const sortN=()=>NEWS.slice().sort((a,b)=>(b.pin||0)-(a.pin||0)||b.date.localeCompare(a.date));
 const newsCard=(x,w)=>{const d=dd(x.date);return `<button class="k${w?"":" nc"}" ${w?'style="text-align:left;width:100%"':""} data-act="newsopen" data-p="${x.id}"><div class="m">${x.pin?"Закреплено · ":""}${d.n} ${d.ms}</div><b style="display:block;margin:4px 0">${esc(x.title)}</b><div class="m nt">${esc(x.text)}</div></button>`};
-const newsBlock=()=>{const n=sortN().slice(0,5);return n.length?`<div class="col" style="gap:8px"><div class="row sb"><b>Новости</b>${NEWS.length>1?'<button class="ch" data-sub="news">Все</button>':""}</div><div class="row hs" style="align-items:stretch">${n.map(x=>newsCard(x)).join("")}</div></div>`:""};
+const newsBlock=()=>{const n=sortN().slice(0,5);return n.length?`<div class="sec"><div class="row sb"><h2 class="st">Новости</h2>${NEWS.length>1?'<button class="ch" data-sub="news">Все</button>':""}</div><div class="row hs" style="align-items:stretch">${n.map(x=>newsCard(x)).join("")}</div></div>`:""};
 const rowA=(t,sub,kind,i)=>`<div class="k row sb"><div style="min-width:0;flex:1"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t)}</b><div class="m">${sub}</div></div><button class="ch" data-act="aform" data-p="${kind}" data-i="${i}">Изменить</button><button class="ch" data-act="adel" data-p="${kind}" data-i="${i}">Удалить</button></div>`;
 const addBar=(k,l)=>`<div class="sticky"><button class="bt" data-act="aform" data-p="${k}" data-i="-1">${l}</button></div>`;
 const NOTE=`<div class="m" style="line-height:1.5">В этой версии изменения хранятся только на этом устройстве. Чтобы их видели все гости, подключается сервер.</div>`;
@@ -191,13 +210,36 @@ aevents:()=>`${hdr("Вечера")}${EVENTS.map((e,i)=>rowA(e.title,e.date+" · 
 form:()=>{const F=FORMS[S.form.kind],v=S.form.v;return `${hdr(F.t)}${S.msg?`<div class="msg bad" role="alert">${S.msg[1]}</div>`:""}${F.f.map(f=>f[2]==="bool"?`<button class="ch ${v[f[0]]?"on":""}" data-act="ftog" data-p="${f[0]}" style="align-self:flex-start">${f[1]}${v[f[0]]?": да":""}</button>`:`<div><label class="lb" for="f_${f[0]}">${f[1]}</label>${f[2]==="area"?`<textarea id="f_${f[0]}" class="fl" rows="5">${esc(v[f[0]]||"")}</textarea>`:`<input id="f_${f[0]}" class="fl" type="${f[2]==="date"?"date":"text"}" value="${esc(v[f[0]]||"")}">`}</div>`).join("")}<div class="sticky"><button class="bt" data-act="fsave">Сохранить</button></div>`}
 });
 
+/* ===== Профиль ===== */
+function stats(){const v=[...new Set(DB.visits)].sort(),ws=[...new Set(v.map(widx))].sort((a,b)=>a-b);let best=0,run=0,p=null;ws.forEach(x=>{run=p!==null&&x===p+1?run+1:1;if(run>best)best=run;p=x});
+let rw=0;for(let n=1;n<=DB.cups;n++)if(REW[((n-1)%CUPS_MAX)+1])rw++;
+const wd=[0,0,0,0,0,0,0];v.forEach(x=>wd[new Date(x+"T12:00:00").getDay()]++);const mx=Math.max(...wd),fav=mx?["воскресенье","понедельник","вторник","среду","четверг","пятницу","субботу"][wd.indexOf(mx)]:"";
+const bk=Object.keys(DB.book).filter(k=>EVENTS.some(e=>e.id===k));
+return{rw,best,fav,visits:v.length,first:v[0],bk}}
+const tgl2=(k,l,sub)=>`<div class="row sb"><div style="min-width:0"><b>${l}</b><div class="m">${sub}</div></div><button class="tgl ${CFG[k]?"on":""}" role="switch" aria-checked="${!!CFG[k]}" aria-label="${l}" data-act="ptog" data-p="${k}"><i></i></button></div>`;
+V.profile=()=>{const u=inTg&&tg.initDataUnsafe&&tg.initDataUnsafe.user,nm=u&&u.first_name?u.first_name:"Гость",st=stats(),sk=streak();
+const mine=st.bk.map(k=>{const e=EVENTS.find(x=>x.id===k),d=dd(e.date);return `<button class="row sb" style="width:100%;text-align:left;padding:10px 0;border-top:1px solid var(--bd)" data-act="ev" data-p="${e.id}"><span style="min-width:0"><b style="font-size:14px">${esc(e.title)}</b><span class="m" style="display:block">${d.n} ${d.m} · мест: ${DB.book[k].length}</span></span><span class="m">Изменить</span></button>`}).join("");
+const hist=DB.hist.slice(0,5).map(x=>`<div class="row sb" style="padding:10px 0;border-top:1px solid var(--bd)"><span style="font-size:14px">${x.n}</span><span class="m">${x.d}</span></div>`).join("");
+return `<h1 class="h">Профиль</h1>
+<div class="k row" style="gap:16px"><div class="av">${esc(nm[0].toUpperCase())}</div><div style="min-width:0"><b style="font-size:18px">${esc(nm)}</b><div class="m" style="margin-top:2px">${u&&u.username?"@"+esc(u.username)+" · ":""}${st.first?"с нами с "+dd(st.first).n+" "+dd(st.first).m:"пока без визитов"}</div></div></div>
+<div class="sec"><h2 class="st">Статистика</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="k stat"><b>${DB.cups}</b><span class="m">кружек всего</span></div><div class="k stat"><b>${st.rw}</b><span class="m">наград получено</span></div>
+<div class="k stat"><b>${sk}</b><span class="m">${pl(sk,["неделя","недели","недель"])} подряд</span></div><div class="k stat"><b>${st.best}</b><span class="m">рекорд серии, недель</span></div></div>
+<div class="k col" style="gap:0">${[["Визитов в кофейню",st.visits],["Записей на вечера",st.bk.length],["Любимый день",st.fav||"—"]].map((r,i)=>`<div class="row sb" style="padding:12px 0;${i?"border-top:1px solid var(--bd)":""}"><span class="m" style="font-size:14px">${r[0]}</span><b>${r[1]}</b></div>`).join("")}</div></div>
+<div class="sec"><h2 class="st">Мои записи на вечера</h2><div class="k" style="padding:6px 18px">${mine||'<div class="m" style="padding:14px 0">Пока нет записей</div>'}</div></div>
+<div class="sec"><h2 class="st">Последние кружки</h2><div class="k" style="padding:6px 18px">${hist||'<div class="m" style="padding:14px 0">Пока пусто. Добавьте код с чека.</div>'}</div></div>
+<div class="sec"><h2 class="st">Настройки</h2><div class="k col"><div><b style="display:block;margin-bottom:10px">Тема</b><div class="seg" role="group" aria-label="Тема">${[["auto","Авто"],["light","Светлая"],["dark","Тёмная"]].map(x=>`<button class="${CFG.theme===x[0]?"on":""}" data-act="theme" data-p="${x[0]}">${x[1]}</button>`).join("")}</div></div>${tgl2("haptic","Вибрация","Отклик при нажатиях")}${tgl2("anim","Анимации","Плавные переходы между экранами")}</div></div>
+${isAdmin()?'<button class="bt" data-sub="admin">Панель администратора</button>':""}
+<button class="bt o" style="color:var(--mu);border-color:var(--bd2)" data-act="wipe">Удалить мои данные на этом устройстве</button>
+${inTg&&!ADMINS.length?`<div class="m">Ваш Telegram ID: ${uid()}</div>`:""}`};
+
 /* ===== Навигация и отрисовка ===== */
 let lastKey="";
 function render(){if(["admin","anews","amenu","aevents","form"].includes(S.sub)&&!isAdmin())S.sub=null;const v=$("#view"),key=S.tab+"|"+S.sub;
 v.innerHTML=V[S.sub||S.tab]();v.classList.toggle("sub",!!S.sub);
 if(key!==lastKey){v.classList.remove("go");void v.offsetWidth;v.classList.add("go");window.scrollTo(0,0);lastKey=key}
 const tb=$("#tabs");tb.style.display=S.sub?"none":"flex";
-tb.innerHTML=TABS.map(t=>`<button class="${t[0]===S.tab?"on":""}" data-go="${t[0]}">${ic(t[2])}${t[1]}</button>`).join("");
+tb.innerHTML=TABS.map(t=>t[0]==="home"?`<button class="hb ${S.tab==="home"?"on":""}" data-go="home" aria-label="Главная"><span class="hc">${ic(t[2],26)}</span><span style="margin-top:2px">${t[1]}</span></button>`:`<button class="${t[0]===S.tab?"on":""}" data-go="${t[0]}">${ic(t[2])}${t[1]}</button>`).join("");
 if(inTg){S.sub?tg.BackButton.show():tg.BackButton.hide()}}
 function back(){if(!S.sub){S.tab="home";return}S.sel=[];S.msg=null;S.sub=S.sub==="form"?S.form.b:({anews:"admin",amenu:"admin",aevents:"admin"}[S.sub]||null)}
 document.addEventListener("click",e=>{
@@ -223,6 +265,9 @@ else if(a==="aform"){const i=+d.i;S.form={kind:d.p,i:i,v:src(d.p,i),b:FORMS[d.p]
 else if(a==="ftog"){rf();S.form.v[d.p]=S.form.v[d.p]?0:1}
 else if(a==="fsave")fsave();
 else if(a==="adel"){const i=+d.i,k=d.p,m="Удалить? Это действие нельзя отменить.",ok=()=>{if(k==="news")NEWS.splice(i,1);else if(k==="event")EVENTS.splice(i,1);else MENU[S.acat].splice(i,1);saveCT();render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
+else if(a==="theme"){CFG.theme=d.p;LS.s("tcfg",CFG);applyTheme()}
+else if(a==="ptog"){CFG[d.p]=CFG[d.p]?0:1;LS.s("tcfg",CFG);applyTheme();if(d.p==="haptic"&&CFG.haptic)hap()}
+else if(a==="wipe"){const m="Удалить кружки, записи и историю на этом устройстве?",ok=()=>{["tdb"].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});Object.assign(DB,{cups:0,hist:[],used:[],visits:[],book:{},wait:{}});render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
 else if(a==="addcode"){S.code=$("#code").value;S.msg=addCode(S.code);if(S.msg[0]==="ok")S.code="";else hap("error")}
 else if(a==="scan"){if(inTg&&tg.showScanQrPopup){tg.showScanQrPopup({text:"Наведите на QR с чека"},txt=>{const m=String(txt).toUpperCase().match(/TR-[A-Z0-9]{4}-[0-9]{2}/);S.msg=addCode(m?m[0]:txt);render();return true})}else{S.msg=["bad","Сканер доступен только внутри Telegram. Введите код вручную"]}}
 render()});
@@ -231,8 +276,9 @@ document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.tar
 ["gesturestart","gesturechange","gestureend"].forEach(n=>document.addEventListener(n,e=>e.preventDefault()));
 document.addEventListener("touchmove",e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
 document.addEventListener("wheel",e=>{if(e.ctrlKey)e.preventDefault()},{passive:false});
+try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{if(CFG.theme==="auto"){applyTheme();render()}})}catch(e){}
 if(inTg)tg.BackButton.onClick(()=>{back();render()});
-render();
+applyTheme();render();
 </script>
 </body>
 </html>
