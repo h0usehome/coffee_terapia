@@ -7,7 +7,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#F6EFE6;--card:#FFFAF4;--bd:#E5D6C6;--bd2:#D9C5B2;--ink:#3A1613;--mu:#7A5F57;--br:#4A1E1B;--on:#F6EFE6;--ac:#B4531A;--onac:#fff;--ok:#2F7D4F;--dash:#C9B3A0;--ph:#EBD9C5;--okbg:#E7F1EA;--okt:#1F5A38;--badbg:#F8E4DD;--badt:#8A2E12;--dkbg:#4A1E1B;--fade:rgba(246,239,230,0)}
+:root{--sat:calc(max(env(safe-area-inset-top,0px),var(--tg-safe-area-inset-top,0px)) + var(--tg-content-safe-area-inset-top,0px));--sab:max(env(safe-area-inset-bottom,0px),var(--tg-safe-area-inset-bottom,0px));--bg:#F6EFE6;--card:#FFFAF4;--bd:#E5D6C6;--bd2:#D9C5B2;--ink:#3A1613;--mu:#7A5F57;--br:#4A1E1B;--on:#F6EFE6;--ac:#B4531A;--onac:#fff;--ok:#2F7D4F;--dash:#C9B3A0;--ph:#EBD9C5;--okbg:#E7F1EA;--okt:#1F5A38;--badbg:#F8E4DD;--badt:#8A2E12;--dkbg:#4A1E1B;--fade:rgba(246,239,230,0)}
 :root[data-theme=dark]{--bg:#1A1311;--card:#261B18;--bd:#3A2B26;--bd2:#4C3B34;--ink:#F3E9DF;--mu:#B7A398;--br:#E6BE94;--on:#2A1512;--ac:#E58C4A;--onac:#2A1512;--ok:#5FBF86;--dash:#6A574E;--ph:#33261F;--okbg:#1E3327;--okt:#9AD9B1;--badbg:#3B2019;--badt:#F2A98F;--dkbg:#4A1E1B;--fade:rgba(26,19,17,0)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Manrope,system-ui,sans-serif;touch-action:manipulation;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
@@ -15,9 +15,9 @@ button,input{font-family:inherit}
 button{color:inherit;cursor:pointer;transition:transform .12s ease,background-color .2s,opacity .2s}
 button:active:not(:disabled){transform:scale(.96)}
 #app{max-width:480px;min-height:100vh;min-height:100dvh;margin:0 auto}
-#view{padding:calc(24px + env(safe-area-inset-top)) 16px calc(112px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:20px}
-#view.sub{padding-bottom:calc(32px + env(safe-area-inset-bottom))}
-.sec{display:flex;flex-direction:column;gap:12px}.sec>.st{font-family:Unbounded,sans-serif;font-weight:600;font-size:15px;margin:0}
+#view{padding:calc(20px + var(--sat)) 16px calc(112px + var(--sab));display:flex;flex-direction:column;gap:20px}
+#view.sub{padding-bottom:calc(32px + var(--sab))}
+.sec{display:flex;flex-direction:column;gap:12px}.st{font-family:Unbounded,sans-serif;font-weight:600;font-size:16px;line-height:1.2;margin:0}
 .h{font-family:Unbounded,sans-serif;font-weight:600;font-size:22px;margin:0;line-height:1.2}
 .k{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:18px}
 .dk{background:var(--dkbg);color:#F6EFE6;border-radius:24px;padding:20px}
@@ -29,7 +29,7 @@ button:active:not(:disabled){transform:scale(.96)}
 .ch.on{background:var(--br);color:var(--on);border-color:var(--br)}
 .ib{width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center}
 .bar{height:8px;border-radius:4px;background:#6E3D37;overflow:hidden}.bar i{display:block;height:100%;background:#F2B26B}
-.t{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:68px;z-index:10;padding-bottom:env(safe-area-inset-bottom);box-sizing:content-box;background:var(--card);border-top:1px solid var(--bd);display:flex}
+.t{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:68px;z-index:10;padding-bottom:var(--sab);box-sizing:content-box;background:var(--card);border-top:1px solid var(--bd);display:flex}
 .t button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:600;color:var(--mu)}
 .t button.on{color:var(--br);font-weight:800}
 .t button{min-width:0}
@@ -54,13 +54,19 @@ button:active:not(:disabled){transform:scale(.96)}
 .lb{font-size:13px;font-weight:700;margin-bottom:6px;display:block}
 .fl{width:100%;border:1px solid var(--bd2);border-radius:14px;background:var(--card);padding:12px 14px;font:500 16px Manrope,sans-serif;color:var(--ink)}
 textarea.fl{resize:vertical;line-height:1.5}
-.hs{overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}.hs::-webkit-scrollbar{display:none}.hs>*{flex:none}
-.nc{width:270px;text-align:left;scroll-snap-align:start}
-.nt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.sticky{position:sticky;bottom:0;margin:8px -16px 0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(var(--fade),var(--bg) 35%);z-index:5}
+.hs{overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px;scroll-padding-inline:16px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}.hs::-webkit-scrollbar{display:none}.hs>*{flex:none}.hs::after{content:"";flex:none;width:4px}
+.nc{width:min(300px,82vw);min-height:176px;padding:20px;text-align:left;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:flex-start}.nc b{font-size:17px;line-height:1.3}
+.nt{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45}
+.sticky{position:sticky;bottom:0;margin:8px -16px 0;padding:12px 16px calc(12px + var(--sab));background:linear-gradient(var(--fade),var(--bg) 35%);z-index:5}
 @keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes grow{from{width:0}}
-.go{animation:in .32s cubic-bezier(.2,.7,.2,1)}.go .bar i{animation:grow .7s cubic-bezier(.2,.7,.2,1)}
+.enter{animation:in .32s cubic-bezier(.2,.7,.2,1)}.enter .bar i{animation:grow .7s cubic-bezier(.2,.7,.2,1)}
+.pg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pc{background:var(--card);border:1px solid var(--bd);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+.pic{position:relative;aspect-ratio:1/1;background:var(--ph)}.pic svg,.pic img{position:absolute;inset:0;width:100%;height:100%}.pic img{object-fit:cover}
+.pb{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.nt2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em;line-height:1.3;font-size:12px;color:var(--mu)}
+.vl{position:absolute;top:10px;right:10px;background:var(--card);font-size:11px;font-weight:600;color:var(--mu);border:1px solid var(--bd2);border-radius:999px;padding:2px 8px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -73,8 +79,22 @@ const ADMINS=[789419620];
 const CUPS_MAX=15, REW={5:"конфета",10:"круассан",15:"кофе в подарок"};
 /* Демо-коды для проверки. В рабочей версии коды проверяет сервер. */
 const VALID=["TR-7K4Q-92","TR-1M8X-45","TR-9P2D-17"];
-let MENU={"Кофе":[["Эспрессо","Короткий и крепкий","[цена]"],["Капучино","Эспрессо и молочная пена","[цена]"],["Латте","Эспрессо и много молока","[цена]"],["Флэт уайт","Двойной эспрессо с молоком","[цена]"],["Матча-латте","Зелёный чай матча с молоком","[цена]"]],
-"Обеды":[["Полезная тарелка","С 12:00 пн–пт, пока не съедят","19 руб"],["Суп дня, 270 г","Добавка к обеду","6,0 руб"],["Хлеб, 30 г","Добавка к обеду","1,5 руб"]]};
+let MENU={"Кофе":[
+{n:"Эспрессо",d:"Короткий и крепкий",v:"30 мл",p:4,u:"k",art:"espresso"},
+{n:"Американо",d:"Эспрессо с горячей водой",v:"200 мл",p:5,u:"k",art:"americano"},
+{n:"Капучино",d:"Эспрессо и воздушная молочная пена",v:"200 мл",p:7,u:"k",art:"cappuccino"},
+{n:"Латте",d:"Эспрессо и много нежного молока",v:"300 мл",p:8,u:"k",art:"latte"},
+{n:"Флэт уайт",d:"Двойной эспрессо с молоком",v:"160 мл",p:8,u:"k",art:"flat"},
+{n:"Раф",d:"Сливочный, с ванильным сахаром",v:"300 мл",p:9,u:"k",art:"raf"}],
+"Не кофе":[
+{n:"Матча-латте",d:"Зелёный чай матча с молоком",v:"300 мл",p:9,u:"k",art:"matcha"},
+{n:"Какао",d:"Густое, с зефирками",v:"250 мл",p:7,u:"k",art:"cocoa"},
+{n:"Чай с лимоном",d:"Чёрный чай, свежий лимон",v:"400 мл",p:5,u:"k",art:"tea"},
+{n:"Лимонад дня",d:"Освежающий, с мятой",v:"400 мл",p:7,u:"k",art:"lemonade"}],
+"Обеды":[
+{n:"Полезная тарелка",d:"С 12:00 пн–пт, пока не съедят",v:"",p:19,u:"r",art:"plate"},
+{n:"Суп дня",d:"Добавка к обеду",v:"270 г",p:6,u:"r",art:"soup"},
+{n:"Хлеб",d:"Добавка к обеду",v:"30 г",p:1.5,u:"r",art:"bread"}]};
 const TABLES=[[1,80,115,"NESW"],[2,179,115,"NESW"],[3,278,115,"WE"],[4,80,235,"WE"],[5,179,235,"NESW"],[6,278,235,"NESW"]];
 const ALL=TABLES.flatMap(t=>[...t[3]].map(p=>t[0]+p));
 let EVENTS=[{id:"e1",date:"2026-11-19",title:"Музыкальный вечер",tag:"Виолончель",time:"19:00",occ:["1N","1E","2W","5S","6N","6W","6E"]},
@@ -90,10 +110,9 @@ const DB=Object.assign({cups:0,hist:[],used:[],visits:[],book:{},wait:{}},LS.g("
 const save=()=>LS.s("tdb",DB);
 /* Контент (новости, меню, вечера). Сейчас хранится на устройстве. С сервером этот блок заменяется запросами к API. */
 let NEWS=[{id:"n1",title:"Музыкальный вечер 19 ноября",text:"Живая музыка в кофейне. Места ограничены, запишитесь заранее в разделе «Вечера».",date:"2026-11-16",pin:1},{id:"n2",title:"Обеды с 12:00",text:"Полезная тарелка по будням с 12:00, пока не съедят.",date:"2026-11-10",pin:0},{id:"n3",title:"Осенние напитки",text:"Загляните за сезонными напитками. Подробности скоро.",date:"2026-11-03",pin:0}];
-{const c=LS.g("tct",null);if(c){MENU=c.menu;EVENTS=c.events;NEWS=c.news}}
-const saveCT=()=>LS.s("tct",{menu:MENU,events:EVENTS,news:NEWS});
-const hap=k=>{if(!CFG.haptic)return;try{if(inTg){k?tg.HapticFeedback.notificationOccurred(k):tg.HapticFeedback.impactOccurred("light")}else if(navigator.vibrate)navigator.vibrate(k?[15,30,15]:10)}catch(e){}};
-const CFG=Object.assign({theme:"auto",haptic:1,anim:1},LS.g("tcfg",{}));
+{const c=LS.g("tct2",null);if(c){MENU=c.menu;EVENTS=c.events;NEWS=c.news}}
+const saveCT=()=>LS.s("tct2",{menu:MENU,events:EVENTS,news:NEWS});
+const CFG=Object.assign({theme:"auto",anim:1},LS.g("tcfg",{}));
 const PAL={light:{bd:"#E5D6C6",dash:"#C9B3A0",mu:"#7A5F57",br:"#4A1E1B",on:"#F6EFE6",card:"#FFFAF4",ink:"#3A1613",ph:"#EBD9C5"},dark:{bd:"#3A2B26",dash:"#6A574E",mu:"#B7A398",br:"#E6BE94",on:"#2A1512",card:"#261B18",ink:"#F3E9DF",ph:"#33261F"}};
 let K=PAL.light,THEME="light";
 function applyTheme(){const dark=CFG.theme==="dark"||(CFG.theme==="auto"&&(inTg&&tg.colorScheme?tg.colorScheme==="dark":window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches));
@@ -108,6 +127,29 @@ const CUP='<path d="M5 9h11v4a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5zM16 10h2a2 2 0 0 1 
 const TABS=[["menu","Меню",CUP],["events","Вечера",'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/>'],["home","Главная",'<path d="M3 11l9-8 9 8v10H3z"/>'],["card","Карта",'<rect x="3" y="6" width="18" height="12" rx="3"/><path d="M3 10h18"/>'],["profile","Профиль",'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 15-5 16 0"/>']];
 const open=u=>{try{inTg?tg.openLink(u):window.open(u,"_blank")}catch(e){window.open(u,"_blank")}};
 
+/* ===== Иллюстрации напитков (замените настоящими фото через поле img) ===== */
+const SC="#F6EFE6",CW="#FFFAF4",LN="#D9C5B2";
+const cupTop=(liq,inner,r)=>{r=r||27;return `<circle cx="60" cy="60" r="50" fill="${SC}" stroke="${LN}" stroke-width="2"/><rect x="82" y="53" width="26" height="14" rx="7" fill="${CW}" stroke="${LN}" stroke-width="2"/><circle cx="60" cy="60" r="${r+8}" fill="${CW}" stroke="${LN}" stroke-width="2"/><circle cx="60" cy="60" r="${r}" fill="${liq}"/>${inner||""}`};
+const heart=c=>`<path d="M60 77C47 68 44 57 50 52c4-3 9-1 10 3 1-4 6-6 10-3 6 5 3 16-10 25z" fill="${c}"/>`;
+const ART={
+espresso:()=>cupTop("#3A2014",'<circle cx="60" cy="60" r="16" fill="#6B3E26" opacity=".8"/><circle cx="55" cy="55" r="5" fill="#8A5A3A" opacity=".6"/>',20),
+americano:()=>cupTop("#4B2A18",'<circle cx="60" cy="60" r="21" fill="none" stroke="#6B3E26" stroke-width="3"/>'),
+cappuccino:()=>cupTop("#B9895E",heart("#FFF3E3")),
+latte:()=>cupTop("#CFA47A",'<ellipse cx="60" cy="46" rx="16" ry="6" fill="#FFF3E3"/><ellipse cx="60" cy="55" rx="13" ry="5.5" fill="#FFF3E3"/><ellipse cx="60" cy="63" rx="10" ry="5" fill="#FFF3E3"/><ellipse cx="60" cy="71" rx="6" ry="4" fill="#FFF3E3"/>'),
+flat:()=>cupTop("#A9764E",'<circle cx="60" cy="60" r="17" fill="#F3E0C8"/><circle cx="60" cy="60" r="9" fill="#A9764E"/>'),
+raf:()=>cupTop("#D9B88F",'<path d="M60 60a4 4 0 0 1 8 0a8 8 0 0 1-16 0a12 12 0 0 1 24 0a16 16 0 0 1-32 0" fill="none" stroke="#FFF3E3" stroke-width="2.5" stroke-linecap="round"/>'),
+matcha:()=>cupTop("#8FA65B",'<circle cx="60" cy="60" r="19" fill="#B9C98A" opacity=".7"/>'+heart("#E9F0C9")),
+cocoa:()=>cupTop("#5B3427",'<circle cx="51" cy="54" r="5.5" fill="#FFF3E3"/><circle cx="67" cy="57" r="5.5" fill="#FFF3E3"/><circle cx="58" cy="68" r="5.5" fill="#FFF3E3"/><circle cx="70" cy="70" r="3" fill="#FFF3E3"/>'),
+tea:()=>cupTop("#C8873A",'<circle cx="60" cy="60" r="20" fill="none" stroke="#E0A85C" stroke-width="2"/><circle cx="64" cy="56" r="10" fill="#F4D95A" stroke="#E0B92E" stroke-width="1.5"/><path d="M64 46v20M54 56h20M57 49l14 14M71 49L57 63" stroke="#E0B92E" stroke-width="1"/>'),
+lemonade:()=>`<circle cx="60" cy="60" r="50" fill="${SC}" stroke="${LN}" stroke-width="2"/><circle cx="60" cy="60" r="38" fill="${CW}" stroke="${LN}" stroke-width="2"/><circle cx="60" cy="60" r="32" fill="#F6E27A"/><circle cx="52" cy="56" r="12" fill="#F7C948" stroke="#E5A92B" stroke-width="1.5"/><path d="M52 44v24M40 56h24M43.5 47.5l17 17M60.5 47.5l-17 17" stroke="#E5A92B"/><path d="M68 74c9-1 13-8 11-15-8 0-13 6-11 15z" fill="#5E9B52"/><path d="M76 70c6 1 10-3 11-8-6-1-10 3-11 8z" fill="#74B466"/>`,
+plate:()=>`<circle cx="60" cy="60" r="50" fill="${SC}" stroke="${LN}" stroke-width="2"/><circle cx="60" cy="60" r="40" fill="${CW}" stroke="${LN}" stroke-width="2"/><path d="M60 60L60 26A34 34 0 0 1 89.4 77Z" fill="#7DA95F" stroke="${CW}" stroke-width="2"/><path d="M60 60L89.4 77A34 34 0 0 1 30.6 77Z" fill="#E2BE72" stroke="${CW}" stroke-width="2"/><path d="M60 60L30.6 77A34 34 0 0 1 60 26Z" fill="#C9724A" stroke="${CW}" stroke-width="2"/><circle cx="72" cy="42" r="4" fill="#C8452F"/><circle cx="80" cy="55" r="3.5" fill="#C8452F"/><circle cx="60" cy="80" r="2" fill="#B88F3E"/><circle cx="52" cy="84" r="2" fill="#B88F3E"/><circle cx="68" cy="86" r="2" fill="#B88F3E"/><circle cx="44" cy="52" r="5" fill="#A95A38"/><circle cx="50" cy="42" r="4" fill="#A95A38"/>`,
+soup:()=>`<circle cx="60" cy="60" r="50" fill="${SC}" stroke="${LN}" stroke-width="2"/><circle cx="60" cy="60" r="40" fill="${CW}" stroke="${LN}" stroke-width="2"/><circle cx="60" cy="60" r="32" fill="#E3923B"/><path d="M48 60a12 12 0 0 1 24 0a8 8 0 0 0-16 0" fill="none" stroke="#FFF3E3" stroke-width="4" stroke-linecap="round"/><circle cx="48" cy="48" r="2.2" fill="#5E9B52"/><circle cx="74" cy="72" r="2.2" fill="#5E9B52"/><circle cx="70" cy="46" r="2.2" fill="#5E9B52"/><circle cx="50" cy="74" r="2.2" fill="#5E9B52"/>`,
+bread:()=>`<circle cx="60" cy="60" r="50" fill="${SC}" stroke="${LN}" stroke-width="2"/><path d="M34 52C34 36 48 30 60 30s26 6 26 22c0 6-3 8-3 12v22c0 3-2 5-5 5H42c-3 0-5-2-5-5V64c0-4-3-6-3-12z" fill="#D9A560" stroke="#A9722F" stroke-width="3" stroke-linejoin="round"/><path d="M42 54c0-10 9-16 18-16s18 6 18 16v26H42z" fill="#F1D39A"/><circle cx="52" cy="52" r="1.8" fill="#C98C45"/><circle cx="66" cy="58" r="1.8" fill="#C98C45"/><circle cx="58" cy="68" r="1.8" fill="#C98C45"/><circle cx="70" cy="72" r="1.8" fill="#C98C45"/>`};
+ART.cup=()=>cupTop("#4B2A18","");
+const artSvg=k=>`<svg viewBox="0 0 120 120" aria-hidden="true">${(ART[k]||ART.cup)()}</svg>`;
+const fmtP=x=>{const n=Number(x.p)||0,t=String(n).replace(".",",");return x.u==="r"?t+" руб":t+" "+pl(Math.floor(n),["комплимент","комплимента","комплиментов"])};
+const menuCard=x=>`<div class="pc"><div class="pic">${artSvg(x.art)}${x.img?`<img src="${esc(x.img)}" alt="" loading="lazy" onerror="this.remove()">`:""}${x.v?`<span class="vl">${esc(x.v)}</span>`:""}</div><div class="pb"><b style="font-size:15px;line-height:1.25">${esc(x.n)}</b><div class="nt2">${esc(x.d)}</div><b style="margin-top:auto;padding-top:8px;color:var(--ac);font-size:14px">${esc(fmtP(x))}</b></div></div>`;
+
 /* ===== Данные ===== */
 const pos=()=>DB.cups?((DB.cups-1)%CUPS_MAX)+1:0;
 function streak(){const w=new Set(DB.visits.map(widx));let c=widx(day()),n=0;if(!w.has(c))c--;while(w.has(c)){n++;c--}return n}
@@ -118,13 +160,23 @@ function addCode(raw){const c=raw.trim().toUpperCase();
 if(!c)return["bad","Введите код с чека"];
 if(DB.used.includes(c))return["bad","Этот код уже использован"];
 if(!VALID.includes(c))return["bad","Код не найден. Проверьте и попробуйте снова"];
-DB.used.push(c);DB.cups++;DB.hist.unshift({d:day(),n:"Кружка добавлена"});if(!DB.visits.includes(day()))DB.visits.push(day());save();hap("success");
+DB.used.push(c);DB.cups++;DB.hist.unshift({d:day(),n:"Кружка добавлена"});if(!DB.visits.includes(day()))DB.visits.push(day());save();
 const p=pos();return["ok","Кружка добавлена: "+p+" из "+CUPS_MAX+(REW[p]?". Награда: "+REW[p]+"!":"")]}
 
 /* ===== Экраны ===== */
 let S={tab:"home",sub:null,p:null,sel:[],cat:"Кофе",rtt:"pd",msg:null,code:""};
 const hdr=(t)=>`<div class="row"><button class="ch ib" data-act="back" aria-label="Назад">${ic('<path d="M15 5l-7 7 7 7"/>')}</button><h1 class="h" style="font-size:20px">${t}</h1></div>`;
-const mark=`<div><div style="font-family:Unbounded,sans-serif;font-weight:600;font-size:22px;letter-spacing:.06em;color:var(--br)">терапия</div><div style="font-size:11px;letter-spacing:.12em;color:var(--mu)">место вкуса и встреч</div></div>`;
+const mark=`<div style="text-align:center"><div style="font-family:Unbounded,sans-serif;font-weight:600;font-size:24px;letter-spacing:.08em;line-height:1.1;color:var(--br)">терапия</div><div style="font-size:11px;letter-spacing:.16em;color:var(--mu);margin-top:6px">место вкуса и встреч</div></div>`;
+/* Приветствие по времени суток: [фраза, только по будням] */
+const GPH={m:[["Мы уже делаем первые кружки кофе, приходите попробовать"],["Свежие круассаны уже ждут к первому кофе"],["Утро лучше начинать с чашки хорошего кофе"],["Загляните на кофе перед делами"]],
+d:[["Самое время для кофе и небольшой паузы"],["Полезная тарелка по будням, пока не съели",1],["Заходите на кофе и что-нибудь сладкое"],["Перерыв? Мы знаем, что его украсит"]],
+e:[["Сегодня можно и по аперольке"],["Вечер для тёплой беседы и хорошей музыки"],["Посмотрите, какие музыкальные вечера впереди"],["Тихий вечер хорошо провести за чашкой чего-нибудь тёплого"]],
+n:[["Уже поздно, а мы ждём вас завтра"],["Ночью лучше спать, а утром приходите на кофе"]]},GI={};
+function greet(name){const dt=new Date(),h=dt.getHours(),wk=dt.getDay()>0&&dt.getDay()<6;
+const p=h>=5&&h<12?"m":h>=12&&h<18?"d":h>=18&&h<23?"e":"n";
+const hi={m:"Доброе утро",d:"Добрый день",e:"Добрый вечер",n:"Доброй ночи"}[p],list=GPH[p].filter(x=>wk||!x[1]);
+if(GI[p]===undefined)GI[p]=Math.floor(Math.random()*1000);
+return{t:hi+(name?", "+name:"")+"!",s:list[GI[p]%list.length][0]}}
 const cell=(n,c)=>n===5?`<div class="cell ${c>=5?"g":"go"}">${ic(CANDY)}</div>`:n===10?`<div class="cell ${c>=10?"g":"go"}">${ic(CROI)}</div>`:n===15?`<div class="cell ${c>=15?"g":"go"}">${ic(CUP)}</div>`:n<=c?`<div class="cell f">${ic(CUP,20)}</div>`:`<div class="cell e"></div>`;
 const sg=(x,y,s)=>s==="o"?`<circle cx="${x}" cy="${y}" r="12" fill="${K.bd}" stroke="${K.dash}" stroke-width="1.5"/><path d="M${x-4} ${y-4}l8 8m0-8l-8 8" stroke="${K.mu}" stroke-width="1.8" stroke-linecap="round"/>`:s==="s"?`<circle cx="${x}" cy="${y}" r="12" fill="${K.br}"/><path d="M${x-5} ${y}l3.5 3.5 6.5-7" stroke="${K.on}" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:`<circle cx="${x}" cy="${y}" r="12" fill="${K.card}" stroke="${K.dash}" stroke-width="1.5"/>`;
 const PD={N:[0,-30],E:[30,0],S:[0,30],W:[-30,0]};
@@ -141,8 +193,9 @@ return `<div class="k col"><div class="row"><div class="dt"><b>${d.n}</b><span>$
 const V={
 home:()=>{const c=pos(),nx=c<5?5:c<10?10:c<15?15:5,l=nx-c,u=inTg&&tg.initDataUnsafe&&tg.initDataUnsafe.user,st=streak(),ev=nextEv(),d=dd(ev.date),b=DB.book[ev.id],cw=widx(day());
 const w=new Set(DB.visits.map(widx)),pills=[5,4,3,2,1,0].map(i=>w.has(cw-i)?`<div class="pill f">${ic(CHECK,16,3)}</div>`:`<div class="pill e"></div>`).join("");
-return `<div class="row sb">${mark}<span class="ch">Открыто до 22:00</span></div>
-<div class="sec" style="gap:4px"><h1 class="h" style="font-size:24px">Привет${u&&u.first_name?", "+esc(u.first_name):""}!</h1><div class="m" style="font-size:14px">Рады вас видеть в «Терапии»</div></div>
+const g=greet(u&&u.first_name?u.first_name:"");
+return `${mark}
+<div class="sec" style="gap:8px"><h1 class="h" style="font-size:26px">${esc(g.t)}</h1><div style="font-size:16px;line-height:1.45;color:var(--mu)">${esc(g.s)}</div></div>
 <div class="dk col"><div class="row sb"><b style="font-size:16px">Ваша карта</b><span class="m">${c} из ${CUPS_MAX} кружек</span></div><div class="bar"><i style="width:${c/CUPS_MAX*100}%"></i></div>
 <div style="line-height:1.4">${!DB.cups?"Первая кружка ждёт вас":c===15?"Карта заполнена: заберите кофе в подарок":`Ещё ${l} ${pl(l,["кружка","кружки","кружек"])} — и награда: ${REW[nx]}`}</div><button class="bt l" data-go="card">Открыть карту</button></div>
 ${newsBlock()}
@@ -170,9 +223,9 @@ return `${hdr("Выбор мест")}<div class="dk" style="padding:12px 16px"><
 done:()=>{const e=EVENTS.find(x=>x.id===S.p),d=dd(e.date),b=DB.book[e.id]||[];
 return `<h1 class="h">Вы записаны</h1><div class="dk"><b style="font-size:17px">${esc(e.title)}</b><div class="m" style="margin-top:4px">${d.w}, ${d.n} ${d.m} · ${e.time}</div><div class="m">Мест: ${b.length} (${b.map(x=>"стол "+x[0]).filter((v,i,a)=>a.indexOf(v)===i).join(", ")})</div></div>
 <div class="m" style="line-height:1.5">Если планы изменятся, отмените запись, чтобы места достались другим.</div><button class="bt" data-sub="route">Как добраться</button><button class="bt o" data-act="back">Готово</button><button class="bt o" style="border-color:var(--bd2);color:var(--mu)" data-act="cancel">Отменить запись</button>`},
-menu:()=>`<h1 class="h">Меню</h1><div class="row hs" style="gap:8px">${Object.keys(MENU).map(k=>`<button class="ch ${k===S.cat?"on":""}" data-act="cat" data-p="${esc(k)}">${esc(k)}</button>`).join("")}</div>
-<div class="k" style="padding:2px 16px">${MENU[S.cat].map((x,i)=>`<div class="row" style="padding:12px 0;${i?"border-top:1px solid var(--bd);":""}align-items:flex-start">${x[3]?`<img class="ph" src="${esc(x[3])}" alt="${esc(x[0])}" loading="lazy">`:`<div class="ph">${ic(CUP,24)}<span>фото</span></div>`}<div style="flex:1"><div class="row sb"><b>${esc(x[0])}</b><b style="color:var(--ac);font-size:14px">${esc(x[2])}</b></div><div class="m" style="margin-top:4px;line-height:1.4">${esc(x[1])}</div></div></div>`).join("")}</div>
-<div class="k row sb" style="border-style:dashed"><div><b style="font-size:14px">Заказ у стойки</b><div class="m">Доставка через Яндекс Еду — скоро</div></div><span class="ch">Скоро</span></div>`,
+menu:()=>{if(!MENU[S.cat])S.cat=Object.keys(MENU)[0];return `<div><h1 class="h">Меню</h1><div class="m" style="margin-top:6px">Цены ориентировочные. Заказ у стойки.</div></div><div class="row hs" style="gap:8px">${Object.keys(MENU).map(k=>`<button class="ch ${k===S.cat?"on":""}" data-act="cat" data-p="${esc(k)}">${esc(k)}</button>`).join("")}</div>
+<div class="pg">${MENU[S.cat].map(menuCard).join("")||'<div class="m">В категории пока пусто</div>'}</div>
+<div class="k row sb" style="border-style:dashed"><div><b style="font-size:14px">Доставка</b><div class="m">Через Яндекс Еду — скоро</div></div><span class="ch">Скоро</span></div>`},
 route:()=>`${hdr("Как нас найти")}<svg width="100%" viewBox="0 0 358 200" role="img" aria-label="Схема района с отметкой кофейни"><rect width="358" height="200" rx="20" fill="${K.ph}"/><path d="M0 60L358 90M0 150L358 130M110 0L140 200M250 0L230 200" stroke="${K.card}" stroke-width="12"/><path d="M179 118c-14-17-22-26-22-36a22 22 0 0 1 44 0c0 10-8 19-22 36z" fill="${K.br}"/><circle cx="179" cy="82" r="8" fill="${K.on}"/></svg>
 <div class="k col" style="gap:6px"><b>Туровского, 24, пом. 209</b><div class="m">Минск · МАЯК МИНСКА</div><div class="m">С 7:30 свежие круассаны, открыто до 22:00</div></div>
 <div class="row" style="gap:8px">${[["pd","Пешком"],["auto","На авто"],["mt","Транспорт"]].map(x=>`<button class="ch ${S.rtt===x[0]?"on":""}" data-act="rtt" data-p="${x[0]}">${x[1]}</button>`).join("")}</div>
@@ -189,23 +242,23 @@ const newsBlock=()=>{const n=sortN().slice(0,5);return n.length?`<div class="sec
 const rowA=(t,sub,kind,i)=>`<div class="k row sb"><div style="min-width:0;flex:1"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t)}</b><div class="m">${sub}</div></div><button class="ch" data-act="aform" data-p="${kind}" data-i="${i}">Изменить</button><button class="ch" data-act="adel" data-p="${kind}" data-i="${i}">Удалить</button></div>`;
 const addBar=(k,l)=>`<div class="sticky"><button class="bt" data-act="aform" data-p="${k}" data-i="-1">${l}</button></div>`;
 const NOTE=`<div class="m" style="line-height:1.5">В этой версии изменения хранятся только на этом устройстве. Чтобы их видели все гости, подключается сервер.</div>`;
-const FORMS={news:{t:"Новость",b:"anews",f:[["title","Заголовок","text"],["text","Текст","area"],["pin","Закрепить вверху","bool"]]},item:{t:"Позиция меню",b:"amenu",f:[["name","Название","text"],["desc","Описание","text"],["price","Цена","text"],["img","Ссылка на фото (необязательно)","text"]]},event:{t:"Вечер",b:"aevents",f:[["title","Название","text"],["tag","Исполнитель или формат","text"],["date","Дата","date"],["time","Время","text"]]},cat:{t:"Новая категория",b:"amenu",f:[["name","Название","text"]]}};
-const src=(k,i)=>i<0?{}:k==="news"?Object.assign({},NEWS[i]):k==="event"?Object.assign({},EVENTS[i]):k==="item"?(x=>({name:x[0],desc:x[1],price:x[2],img:x[3]||""}))(MENU[S.acat][i]):{};
+const FORMS={news:{t:"Новость",b:"anews",f:[["title","Заголовок","text"],["text","Текст","area"],["pin","Закрепить вверху","bool"]]},item:{t:"Позиция меню",b:"amenu",f:[["name","Название","text"],["desc","Описание","text"],["price","Цена (число)","text"],["rub","Цена в рублях (иначе в комплиментах)","bool"],["vol","Объём или вес, например 200 мл","text"],["img","Ссылка на фото (необязательно)","text"]]},event:{t:"Вечер",b:"aevents",f:[["title","Название","text"],["tag","Исполнитель или формат","text"],["date","Дата","date"],["time","Время","text"]]},cat:{t:"Новая категория",b:"amenu",f:[["name","Название","text"]]}};
+const src=(k,i)=>i<0?{}:k==="news"?Object.assign({},NEWS[i]):k==="event"?Object.assign({},EVENTS[i]):k==="item"?(x=>({name:x.n,desc:x.d,price:String(x.p).replace(".",","),rub:x.u==="r"?1:0,vol:x.v||"",img:x.img||"",art:x.art||""}))(MENU[S.acat][i]):{};
 const rf=()=>{FORMS[S.form.kind].f.forEach(f=>{if(f[2]!=="bool"){const el=$("#f_"+f[0]);if(el)S.form.v[f[0]]=el.value}})};
 function fsave(){rf();const F=S.form,v=F.v,i=F.i,k=F.kind,need=k==="news"?v.title:(k==="item"||k==="cat")?v.name:(v.title&&v.date);
 if(!String(need||"").trim()){S.msg=["bad","Заполните обязательные поля"];return}
 if(k==="news"){const o={id:v.id||"n"+Date.now(),title:v.title.trim(),text:(v.text||"").trim(),pin:v.pin?1:0,date:v.date||day()};i>=0?NEWS[i]=o:NEWS.unshift(o)}
-else if(k==="item"){const a=[v.name.trim(),(v.desc||"").trim(),(v.price||"").trim(),(v.img||"").trim()];i>=0?MENU[S.acat][i]=a:MENU[S.acat].push(a)}
+else if(k==="item"){const a={n:v.name.trim(),d:(v.desc||"").trim(),p:parseFloat(String(v.price||"0").replace(",","."))||0,u:v.rub?"r":"k",v:(v.vol||"").trim(),img:(v.img||"").trim(),art:v.art||""};i>=0?MENU[S.acat][i]=a:MENU[S.acat].push(a)}
 else if(k==="event"){const o={id:v.id||"e"+Date.now(),title:v.title.trim(),tag:(v.tag||"").trim(),date:v.date,time:(v.time||"19:00").trim(),occ:v.occ||[]};i>=0?EVENTS[i]=o:EVENTS.push(o);EVENTS.sort((a,b)=>a.date.localeCompare(b.date))}
 else{const n=v.name.trim();if(!MENU[n])MENU[n]=[];S.acat=n}
-saveCT();hap("success");S.sub=F.b;S.msg=null}
+saveCT();S.sub=F.b;S.msg=null}
 const tile=(s,t,d)=>`<button class="k" style="text-align:left" data-sub="${s}"><b>${t}</b><div class="m" style="margin-top:4px">${d}</div></button>`;
 Object.assign(V,{
 news:()=>`${hdr("Новости")}${sortN().map(x=>newsCard(x,1)).join("")}`,
 newsitem:()=>{const x=NEWS.find(n=>n.id===S.p);if(!x)return hdr("Новость");const d=dd(x.date);return `${hdr("Новость")}<div class="k col"><div class="m">${d.n} ${d.m}</div><b style="font-size:18px">${esc(x.title)}</b><div style="white-space:pre-wrap;line-height:1.5">${esc(x.text)}</div></div>`},
 admin:()=>`${hdr("Администратор")}${NOTE}${tile("anews","Новости","Добавить и изменить новости на главной")}${tile("amenu","Меню","Позиции, цены, описания и фото")}${tile("aevents","Вечера","Название, дата и время")}`,
 anews:()=>`${hdr("Новости")}${sortN().map(x=>rowA(x.title,(x.pin?"Закреплено · ":"")+x.date,"news",NEWS.indexOf(x))).join("")||'<div class="m">Новостей пока нет</div>'}${addBar("news","Добавить новость")}`,
-amenu:()=>{if(!MENU[S.acat])S.acat=Object.keys(MENU)[0];return `${hdr("Меню")}<div class="row hs" style="gap:8px">${Object.keys(MENU).map(k=>`<button class="ch ${k===S.acat?"on":""}" data-act="acat" data-p="${esc(k)}">${esc(k)}</button>`).join("")}<button class="ch" data-act="aform" data-p="cat" data-i="-1">+ Категория</button></div>${MENU[S.acat].map((x,i)=>rowA(x[0],esc(x[2]),"item",i)).join("")||'<div class="m">В категории пока пусто</div>'}${addBar("item","Добавить позицию")}`},
+amenu:()=>{if(!MENU[S.acat])S.acat=Object.keys(MENU)[0];return `${hdr("Меню")}<div class="row hs" style="gap:8px">${Object.keys(MENU).map(k=>`<button class="ch ${k===S.acat?"on":""}" data-act="acat" data-p="${esc(k)}">${esc(k)}</button>`).join("")}<button class="ch" data-act="aform" data-p="cat" data-i="-1">+ Категория</button></div>${MENU[S.acat].map((x,i)=>rowA(x.n,esc(fmtP(x)),"item",i)).join("")||'<div class="m">В категории пока пусто</div>'}${addBar("item","Добавить позицию")}`},
 aevents:()=>`${hdr("Вечера")}${EVENTS.map((e,i)=>rowA(e.title,e.date+" · "+e.time,"event",i)).join("")}${addBar("event","Добавить вечер")}`,
 form:()=>{const F=FORMS[S.form.kind],v=S.form.v;return `${hdr(F.t)}${S.msg?`<div class="msg bad" role="alert">${S.msg[1]}</div>`:""}${F.f.map(f=>f[2]==="bool"?`<button class="ch ${v[f[0]]?"on":""}" data-act="ftog" data-p="${f[0]}" style="align-self:flex-start">${f[1]}${v[f[0]]?": да":""}</button>`:`<div><label class="lb" for="f_${f[0]}">${f[1]}</label>${f[2]==="area"?`<textarea id="f_${f[0]}" class="fl" rows="5">${esc(v[f[0]]||"")}</textarea>`:`<input id="f_${f[0]}" class="fl" type="${f[2]==="date"?"date":"text"}" value="${esc(v[f[0]]||"")}">`}</div>`).join("")}<div class="sticky"><button class="bt" data-act="fsave">Сохранить</button></div>`}
 });
@@ -228,7 +281,7 @@ return `<h1 class="h">Профиль</h1>
 <div class="k col" style="gap:0">${[["Визитов в кофейню",st.visits],["Записей на вечера",st.bk.length],["Любимый день",st.fav||"—"]].map((r,i)=>`<div class="row sb" style="padding:12px 0;${i?"border-top:1px solid var(--bd)":""}"><span class="m" style="font-size:14px">${r[0]}</span><b>${r[1]}</b></div>`).join("")}</div></div>
 <div class="sec"><h2 class="st">Мои записи на вечера</h2><div class="k" style="padding:6px 18px">${mine||'<div class="m" style="padding:14px 0">Пока нет записей</div>'}</div></div>
 <div class="sec"><h2 class="st">Последние кружки</h2><div class="k" style="padding:6px 18px">${hist||'<div class="m" style="padding:14px 0">Пока пусто. Добавьте код с чека.</div>'}</div></div>
-<div class="sec"><h2 class="st">Настройки</h2><div class="k col"><div><b style="display:block;margin-bottom:10px">Тема</b><div class="seg" role="group" aria-label="Тема">${[["auto","Авто"],["light","Светлая"],["dark","Тёмная"]].map(x=>`<button class="${CFG.theme===x[0]?"on":""}" data-act="theme" data-p="${x[0]}">${x[1]}</button>`).join("")}</div></div>${tgl2("haptic","Вибрация","Отклик при нажатиях")}${tgl2("anim","Анимации","Плавные переходы между экранами")}</div></div>
+<div class="sec"><h2 class="st">Настройки</h2><div class="k col"><div><b style="display:block;margin-bottom:10px">Тема</b><div class="seg" role="group" aria-label="Тема">${[["auto","Авто"],["light","Светлая"],["dark","Тёмная"]].map(x=>`<button class="${CFG.theme===x[0]?"on":""}" data-act="theme" data-p="${x[0]}">${x[1]}</button>`).join("")}</div></div>${tgl2("anim","Анимации","Плавные переходы между экранами")}</div></div>
 ${isAdmin()?'<button class="bt" data-sub="admin">Панель администратора</button>':""}
 <button class="bt o" style="color:var(--mu);border-color:var(--bd2)" data-act="wipe">Удалить мои данные на этом устройстве</button>
 ${inTg&&!ADMINS.length?`<div class="m">Ваш Telegram ID: ${uid()}</div>`:""}`};
@@ -237,21 +290,21 @@ ${inTg&&!ADMINS.length?`<div class="m">Ваш Telegram ID: ${uid()}</div>`:""}`}
 let lastKey="";
 function render(){if(["admin","anews","amenu","aevents","form"].includes(S.sub)&&!isAdmin())S.sub=null;const v=$("#view"),key=S.tab+"|"+S.sub;
 v.innerHTML=V[S.sub||S.tab]();v.classList.toggle("sub",!!S.sub);
-if(key!==lastKey){v.classList.remove("go");void v.offsetWidth;v.classList.add("go");window.scrollTo(0,0);lastKey=key}
+if(key!==lastKey){v.classList.remove("enter");void v.offsetWidth;v.classList.add("enter");window.scrollTo(0,0);lastKey=key}
 const tb=$("#tabs");tb.style.display=S.sub?"none":"flex";
 tb.innerHTML=TABS.map(t=>t[0]==="home"?`<button class="hb ${S.tab==="home"?"on":""}" data-go="home" aria-label="Главная"><span class="hc">${ic(t[2],26)}</span><span style="margin-top:2px">${t[1]}</span></button>`:`<button class="${t[0]===S.tab?"on":""}" data-go="${t[0]}">${ic(t[2])}${t[1]}</button>`).join("");
 if(inTg){S.sub?tg.BackButton.show():tg.BackButton.hide()}}
 function back(){if(!S.sub){S.tab="home";return}S.sel=[];S.msg=null;S.sub=S.sub==="form"?S.form.b:({anews:"admin",amenu:"admin",aevents:"admin"}[S.sub]||null)}
 document.addEventListener("click",e=>{
 const sx=e.target.closest("[data-seat]");
-if(sx){if(sx.dataset.st==="o")return;const id=sx.dataset.seat,i=S.sel.indexOf(id);if(i>=0)S.sel.splice(i,1);else if(S.sel.length<6)S.sel.push(id);hap();render();return}
-const t=e.target.closest("[data-go],[data-act],[data-sub]");if(!t)return;hap();const d=t.dataset,a=d.act;
+if(sx){if(sx.dataset.st==="o")return;const id=sx.dataset.seat,i=S.sel.indexOf(id);if(i>=0)S.sel.splice(i,1);else if(S.sel.length<6)S.sel.push(id);render();return}
+const t=e.target.closest("[data-go],[data-act],[data-sub]");if(!t)return;const d=t.dataset,a=d.act;
 if(d.go){S.tab=d.go;S.sub=null}
 else if(d.sub){S.sub=d.sub;S.msg=null}
 else if(a==="back")back();
 else if(a==="ev"){S.p=d.p;S.sel=(DB.book[d.p]||[]).slice();S.sub="seats"}
 else if(a==="clear")S.sel=[];
-else if(a==="book"){DB.book[S.p]=S.sel.slice();save();hap("success");S.sub="done"}
+else if(a==="book"){DB.book[S.p]=S.sel.slice();save();S.sub="done"}
 else if(a==="cancel"){delete DB.book[S.p];save();S.sub=null}
 else if(a==="wait"){DB.wait[d.p]=1;save()}
 else if(a==="cat")S.cat=d.p;
@@ -266,9 +319,9 @@ else if(a==="ftog"){rf();S.form.v[d.p]=S.form.v[d.p]?0:1}
 else if(a==="fsave")fsave();
 else if(a==="adel"){const i=+d.i,k=d.p,m="Удалить? Это действие нельзя отменить.",ok=()=>{if(k==="news")NEWS.splice(i,1);else if(k==="event")EVENTS.splice(i,1);else MENU[S.acat].splice(i,1);saveCT();render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
 else if(a==="theme"){CFG.theme=d.p;LS.s("tcfg",CFG);applyTheme()}
-else if(a==="ptog"){CFG[d.p]=CFG[d.p]?0:1;LS.s("tcfg",CFG);applyTheme();if(d.p==="haptic"&&CFG.haptic)hap()}
+else if(a==="ptog"){CFG[d.p]=CFG[d.p]?0:1;LS.s("tcfg",CFG);applyTheme()}
 else if(a==="wipe"){const m="Удалить кружки, записи и историю на этом устройстве?",ok=()=>{["tdb"].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});Object.assign(DB,{cups:0,hist:[],used:[],visits:[],book:{},wait:{}});render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
-else if(a==="addcode"){S.code=$("#code").value;S.msg=addCode(S.code);if(S.msg[0]==="ok")S.code="";else hap("error")}
+else if(a==="addcode"){S.code=$("#code").value;S.msg=addCode(S.code);if(S.msg[0]==="ok")S.code="";}
 else if(a==="scan"){if(inTg&&tg.showScanQrPopup){tg.showScanQrPopup({text:"Наведите на QR с чека"},txt=>{const m=String(txt).toUpperCase().match(/TR-[A-Z0-9]{4}-[0-9]{2}/);S.msg=addCode(m?m[0]:txt);render();return true})}else{S.msg=["bad","Сканер доступен только внутри Telegram. Введите код вручную"]}}
 render()});
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset&&e.target.dataset.seat){e.preventDefault();e.target.dispatchEvent(new MouseEvent("click",{bubbles:true}))}});
