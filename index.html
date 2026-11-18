@@ -189,14 +189,14 @@ if(GI[p]===undefined)GI[p]=Math.floor(Math.random()*1000);
 return{t:hi+(name?", "+name:"")+"!",s:list[GI[p]%list.length][0]}}
 const cell=(n,c)=>n===5?`<div class="cell ${c>=5?"g":"go"}">${ic(CANDY)}</div>`:n===10?`<div class="cell ${c>=10?"g":"go"}">${ic(CROI)}</div>`:n===15?`<div class="cell ${c>=15?"g":"go"}">${ic(CUP)}</div>`:n<=c?`<div class="cell f">${ic(CUP,20)}</div>`:`<div class="cell e"></div>`;
 const sg=(x,y,s)=>s==="o"?`<circle cx="${x}" cy="${y}" r="12" fill="${K.bd}" stroke="${K.dash}" stroke-width="1.5"/><path d="M${x-4} ${y-4}l8 8m0-8l-8 8" stroke="${K.mu}" stroke-width="1.8" stroke-linecap="round"/>`:s==="s"?`<circle cx="${x}" cy="${y}" r="12" fill="${K.br}"/><path d="M${x-5} ${y}l3.5 3.5 6.5-7" stroke="${K.on}" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:`<circle cx="${x}" cy="${y}" r="12" fill="${K.card}" stroke="${K.dash}" stroke-width="1.5"/>`;
-function mapSvg(e){const o=new Set(taken(e)),vb=HALL.vb,tm=S.mode==="table",bad=new Set(tm?HALL.tables.filter(t=>tableSeats(t[0]).some(x=>o.has(x))).map(t=>t[0]):[]);let g=`<rect x="${vb[0]}" y="${vb[1]}" width="${vb[2]}" height="${vb[3]}" fill="${K.card}"/>`;
+function mapSvg(e){const o=new Set(taken(e)),vb=HALL.vb;let g=`<rect x="${vb[0]}" y="${vb[1]}" width="${vb[2]}" height="${vb[3]}" fill="${K.card}"/>`;
 HALL.walls.forEach(w=>{g+=`<path d="M${w[0]} ${w[1]}L${w[2]} ${w[3]}" stroke="${K.br}" stroke-width="5" stroke-linecap="square" fill="none"/>`});
 HALL.labels.forEach(l=>{g+=`<text x="${l[0]}" y="${l[1]+4}" text-anchor="middle" font-size="11" font-weight="700" fill="${K.mu}">${esc(l[2])}</text>`});
 HALL.rects.forEach(r=>{g+=`<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" rx="10" fill="${r[5]==="stage"?K.br:K.mu}"/><text x="${r[0]+r[2]/2}" y="${r[1]+r[3]/2+4}" text-anchor="middle" font-size="11" font-weight="700" fill="${K.on}">${esc(r[4])}</text>`});
-HALL.tables.forEach(t=>{const sel=tm&&S.sel.length&&tableOf(S.sel[0])===t[0];g+=`<g data-table="${esc(t[0])}" ${bad.has(t[0])?'opacity=".45"':""}><circle cx="${t[1]}" cy="${t[2]}" r="${sel?t[3]+3:t[3]}" fill="${sel?K.br:K.bd}"/><text x="${t[1]}" y="${t[2]+5}" text-anchor="middle" font-size="13" font-weight="700" fill="${sel?K.on:K.ink}">${esc(t[0])}</text></g>`});
-HALL.seats.forEach(q=>{const id=q[0],st=S.sel.includes(id)?"s":(o.has(id)||bad.has(tableOf(id)))?"o":"f";
+HALL.tables.forEach(t=>{const sel=isWhole(S.sel)&&tableOf(S.sel[0])===t[0];g+=`<g data-table="${esc(t[0])}" ><circle cx="${t[1]}" cy="${t[2]}" r="${sel?t[3]+3:t[3]}" fill="${sel?K.br:K.bd}"/><text x="${t[1]}" y="${t[2]+5}" text-anchor="middle" font-size="13" font-weight="700" fill="${sel?K.on:K.ink}">${esc(t[0])}</text></g>`});
+HALL.seats.forEach(q=>{const id=q[0],st=S.sel.includes(id)?"s":o.has(id)?"o":"f";
 g+=`<g data-seat="${id}" data-st="${st}" role="button" tabindex="0" aria-label="Место ${id}, ${st==="s"?"выбрано":st==="o"?"занято":"свободно"}"><circle cx="${q[1]}" cy="${q[2]}" r="13" fill="transparent"/>${sg(q[1],q[2],st)}</g>`});
-return `<div style="border:1px solid var(--bd);border-radius:22px;overflow-x:auto;background:var(--card);-webkit-overflow-scrolling:touch"><svg viewBox="${vb.join(" ")}" width="${Math.round(vb[2]*1.15)}" height="${Math.round(vb[3]*1.15)}" style="display:block;max-width:none">${g}</svg></div><div class="m" style="text-align:center">Карту можно прокрутить вбок</div>`}
+return `<div style="border:1px solid var(--bd);border-radius:22px;overflow-x:auto;background:var(--card);-webkit-overflow-scrolling:touch"><svg viewBox="${vb.join(" ")}" width="${Math.round(vb[2]*1.15)}" height="${Math.round(vb[3]*1.15)}" style="display:block;max-width:none">${g}</svg></div><div class="m" style="text-align:center">Нажмите на место или на стол целиком. Карту можно прокрутить вбок</div>`}
 const lg=(s,t)=>`<div class="row" style="gap:6px"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">${sg(12,12,s)}</svg><span class="m">${t}</span></div>`;
 function evCard(e){const d=dd(e.date),b=DB.book[e.id],l=left(e);
 const act=b?`<button class="bt o" data-act="ev" data-p="${e.id}">Изменить запись</button>`:l>0?`<button class="bt" data-act="ev" data-p="${e.id}">Записаться</button>`:DB.wait[e.id]?`<button class="bt o" disabled>Вы в листе ожидания</button>`:`<button class="bt o" data-act="wait" data-p="${e.id}">В лист ожидания</button>`;
@@ -228,10 +228,10 @@ ${S.msg?`<div class="msg ${S.msg[0]==="bad"?"bad":""}" role="status">${S.msg[1]}
 ${ADMINS.length?"":`<div class="k m" style="line-height:1.6">Для теста: ${VALID.join(", ")}</div>`}`,
 events:()=>`<div><h1 class="h">Вечера</h1><div class="m" style="margin-top:6px">Живая музыка в Терапии. Нужна запись, мест немного.</div></div>${EVENTS.map(evCard).join("")}`,
 seats:()=>{const e=EVENTS.find(x=>x.id===S.p),d=dd(e.date),n=S.sel.length;
-return `${hdr("Выбор мест")}<div class="dk" style="padding:12px 16px"><b>${esc(e.title)}${e.tag?" · "+esc(e.tag.toLowerCase()):""}</b><div class="m">${d.w}, ${d.n} ${d.m} · ${e.time}</div></div><div class="seg" role="group" aria-label="Что бронируем"><button class="${S.mode==="table"?"":"on"}" data-act="mode" data-p="seat">Места</button><button class="${S.mode==="table"?"on":""}" data-act="mode" data-p="table">Стол целиком</button></div>${mapSvg(e)}
+return `${hdr("Выбор мест")}<div class="dk" style="padding:12px 16px"><b>${esc(e.title)}${e.tag?" · "+esc(e.tag.toLowerCase()):""}</b><div class="m">${d.w}, ${d.n} ${d.m} · ${e.time}</div></div>${mapSvg(e)}
 <div class="row sb">${lg("f","Свободно")}${lg("o","Занято")}${lg("s","Ваш выбор")}</div>
-<div class="k row sb" style="padding:12px 16px"><div><b>${n?(S.mode==="table"?"Стол "+tableOf(S.sel[0])+": "+n+" "+pl(n,["место","места","мест"]):"Выбрано: "+n+" "+pl(n,["место","места","мест"])):(S.mode==="table"?"Выберите стол":"Выберите места")}</b><div class="m">${S.mode==="table"?"Бронируется весь стол сразу":"Можно до "+MAXS+" мест"}</div></div>${n?'<button class="ch" data-act="clear">Сбросить</button>':""}</div>
-<div class="sticky"><button class="bt" style="height:52px;font-size:16px" data-act="book" ${n?"":"disabled"}>${n?(S.mode==="table"?"Забронировать стол "+tableOf(S.sel[0]):"Забронировать "+n+" "+pl(n,["место","места","мест"])):"Забронировать"}</button></div>`},
+<div class="k row sb" style="padding:12px 16px"><div><b>${n?(isWhole(S.sel)?"Стол "+tableOf(S.sel[0])+": "+n+" "+pl(n,["место","места","мест"]):"Выбрано: "+n+" "+pl(n,["место","места","мест"])):"Выберите место или стол"}</b><div class="m">${isWhole(S.sel)?"Бронируется весь стол сразу":"До "+MAXS+" мест или стол целиком"}</div></div>${n?'<button class="ch" data-act="clear">Сбросить</button>':""}</div>
+<div class="sticky"><button class="bt" style="height:52px;font-size:16px" data-act="book" ${n?"":"disabled"}>${n?(isWhole(S.sel)?"Забронировать стол "+tableOf(S.sel[0]):"Забронировать "+n+" "+pl(n,["место","места","мест"])):"Забронировать"}</button></div>`},
 done:()=>{const e=EVENTS.find(x=>x.id===S.p),d=dd(e.date),b=DB.book[e.id]||[];
 return `<h1 class="h">Вы записаны</h1><div class="dk"><b style="font-size:17px">${esc(e.title)}</b><div class="m" style="margin-top:4px">${d.w}, ${d.n} ${d.m} · ${e.time}</div><div class="m">${isWhole(b)?"Весь стол":"Мест: "+b.length} (${[...new Set(b.map(x=>x.slice(0,-1)))].map(t=>"стол "+t).join(", ")})</div></div>
 <div class="m" style="line-height:1.5">Если планы изменятся, отмените запись, чтобы места достались другим.</div><button class="bt" data-sub="route">Как добраться</button><button class="bt o" data-act="back">Готово</button><button class="bt o" style="border-color:var(--bd2);color:var(--mu)" data-act="cancel">Отменить запись</button>`},
@@ -310,14 +310,13 @@ function back(){if(!S.sub){S.tab="home";return}S.sel=[];S.msg=null;S.sub=S.sub==
 function pickTable(n){const ev=EVENTS.find(x=>x.id===S.p);if(!ev)return;const o=new Set(taken(ev)),ss=tableSeats(n);if(ss.some(x=>o.has(x)))return;S.sel=S.sel.length&&tableOf(S.sel[0])===n?[]:ss}
 document.addEventListener("click",e=>{
 const sx=e.target.closest("[data-seat]");
-if(sx){if(sx.dataset.st==="o")return;const id=sx.dataset.seat;if(S.mode==="table")pickTable(tableOf(id));else{const i=S.sel.indexOf(id);if(i>=0)S.sel.splice(i,1);else if(S.sel.length<MAXS)S.sel.push(id)}render();return}
-const tx=e.target.closest("[data-table]");if(tx){if(S.mode==="table")pickTable(tx.dataset.table);return render()}
+if(sx){if(sx.dataset.st==="o")return;const id=sx.dataset.seat;{if(S.sel.length>MAXS)S.sel=[];const i=S.sel.indexOf(id);if(i>=0)S.sel.splice(i,1);else if(S.sel.length<MAXS)S.sel.push(id)}render();return}
+const tx=e.target.closest("[data-table]");if(tx){pickTable(tx.dataset.table);return render()}
 const t=e.target.closest("[data-go],[data-act],[data-sub]");if(!t)return;const d=t.dataset,a=d.act;
 if(d.go){S.tab=d.go;S.sub=null}
 else if(d.sub){S.sub=d.sub;S.msg=null}
 else if(a==="back")back();
-else if(a==="ev"){S.p=d.p;S.sel=(DB.book[d.p]||[]).slice();S.mode=isWhole(S.sel)?"table":"seat";S.sub="seats"}
-else if(a==="mode"){S.mode=d.p;S.sel=[]}
+else if(a==="ev"){S.p=d.p;S.sel=(DB.book[d.p]||[]).slice();S.sub="seats"}
 else if(a==="clear")S.sel=[];
 else if(a==="book"){DB.book[S.p]=S.sel.slice();save();S.sub="done"}
 else if(a==="cancel"){delete DB.book[S.p];save();S.sub=null}
