@@ -95,10 +95,11 @@ let MENU={"Кофе":[
 {n:"Полезная тарелка",d:"С 12:00 пн–пт, пока не съедят",v:"",p:19,u:"r",art:"plate"},
 {n:"Суп дня",d:"Добавка к обеду",v:"270 г",p:6,u:"r",art:"soup"},
 {n:"Хлеб",d:"Добавка к обеду",v:"30 г",p:1.5,u:"r",art:"bread"}]};
-const TABLES=[[1,80,115,"NESW"],[2,179,115,"NESW"],[3,278,115,"WE"],[4,80,235,"WE"],[5,179,235,"NESW"],[6,278,235,"NESW"]];
-const ALL=TABLES.flatMap(t=>[...t[3]].map(p=>t[0]+p));
-let EVENTS=[{id:"e1",date:"2026-11-19",title:"Музыкальный вечер",tag:"Виолончель",time:"19:00",occ:["1N","1E","2W","5S","6N","6W","6E"]},
-{id:"e2",date:"2026-12-03",title:"Кино и пианино",tag:"",time:"19:00",occ:["1N","4W","5N"]},
+/* Карта зала: координаты из дизайн-файла (столы, места, сцена, бар) */
+const HALL={"vb": [17, 0, 531, 282], "rects": [[248, 14, 120, 34, "Сцена · пианино", "stage"], [119, 189, 98, 73, "Бар", "bar"]], "tables": [["2", 72, 83, 18], ["3", 180, 83, 18], ["10", 400, 66, 18], ["11", 492, 66, 18], ["12", 454, 119, 18], ["4", 180, 167, 18], ["5", 270, 167, 18], ["6", 270, 208, 18], ["7", 270, 250, 18], ["1", 78, 220, 22], ["9", 370, 182, 18], ["8", 370, 241, 18]], "seats": [["2A", 61, 53], ["2B", 85, 53], ["2C", 72, 113], ["3A", 180, 53], ["3B", 210, 83], ["3C", 180, 113], ["3D", 150, 83], ["10A", 370, 66], ["10B", 430, 66], ["11A", 462, 66], ["11B", 522, 66], ["12A", 424, 119], ["12B", 484, 119], ["4A", 150, 167], ["4B", 210, 167], ["5A", 240, 167], ["5B", 300, 167], ["6A", 240, 208], ["6B", 300, 208], ["7A", 240, 250], ["7B", 300, 250], ["1A", 48, 195], ["1B", 102, 193], ["1C", 99, 252], ["1D", 67, 255], ["1E", 43, 225], ["9A", 400, 170], ["9B", 400, 196], ["9C", 340, 182], ["8A", 400, 229], ["8B", 400, 255], ["8C", 340, 241]]};
+const ALL=HALL.seats.map(x=>x[0]);
+let EVENTS=[{id:"e1",date:"2026-11-19",title:"Музыкальный вечер",tag:"Виолончель",time:"19:00",occ:["2A","3B","4A","9A","10A","10B","12B"]},
+{id:"e2",date:"2026-12-03",title:"Кино и пианино",tag:"",time:"19:00",occ:["1A","5A","7B"]},
 {id:"e3",date:"2026-12-17",title:"Музыкальный вечер",tag:"Фортепиано",time:"19:00",occ:"all"}];
 
 /* ===== Утилиты ===== */
@@ -108,6 +109,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 const LS={g(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const DB=Object.assign({cups:0,hist:[],used:[],visits:[],book:{},wait:{}},LS.g("tdb",{}));
 const cloud=(()=>{try{return inTg&&tg.CloudStorage&&tg.isVersionAtLeast("6.9")?tg.CloudStorage:null}catch(e){return null}})();
+Object.keys(DB.book).forEach(k=>{DB.book[k]=(DB.book[k]||[]).filter(x=>ALL.includes(x));if(!DB.book[k].length)delete DB.book[k]});
 const save=()=>{DB.ts=Date.now();DB.hist=DB.hist.slice(0,20);DB.used=DB.used.slice(-100);LS.s("tdb",DB);if(cloud){try{cloud.setItem("tdb",JSON.stringify(DB))}catch(e){}}};
 const EMPTY=()=>({cups:0,hist:[],used:[],visits:[],book:{},wait:{}});
 /* Данные гостя хранятся в облаке Telegram и одинаковы на всех устройствах; побеждает более свежая версия */
@@ -185,12 +187,12 @@ if(GI[p]===undefined)GI[p]=Math.floor(Math.random()*1000);
 return{t:hi+(name?", "+name:"")+"!",s:list[GI[p]%list.length][0]}}
 const cell=(n,c)=>n===5?`<div class="cell ${c>=5?"g":"go"}">${ic(CANDY)}</div>`:n===10?`<div class="cell ${c>=10?"g":"go"}">${ic(CROI)}</div>`:n===15?`<div class="cell ${c>=15?"g":"go"}">${ic(CUP)}</div>`:n<=c?`<div class="cell f">${ic(CUP,20)}</div>`:`<div class="cell e"></div>`;
 const sg=(x,y,s)=>s==="o"?`<circle cx="${x}" cy="${y}" r="12" fill="${K.bd}" stroke="${K.dash}" stroke-width="1.5"/><path d="M${x-4} ${y-4}l8 8m0-8l-8 8" stroke="${K.mu}" stroke-width="1.8" stroke-linecap="round"/>`:s==="s"?`<circle cx="${x}" cy="${y}" r="12" fill="${K.br}"/><path d="M${x-5} ${y}l3.5 3.5 6.5-7" stroke="${K.on}" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:`<circle cx="${x}" cy="${y}" r="12" fill="${K.card}" stroke="${K.dash}" stroke-width="1.5"/>`;
-const PD={N:[0,-30],E:[30,0],S:[0,30],W:[-30,0]};
-function mapSvg(e){const o=new Set(taken(e));let g="";
-TABLES.forEach(([n,cx,cy,ps])=>{g+=`<circle cx="${cx}" cy="${cy}" r="18" fill="${K.bd}"/><text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="13" font-weight="700" fill="${K.ink}">${n}</text>`;
-[...ps].forEach((p,i)=>{const id=n+p,x=cx+PD[p][0],y=cy+PD[p][1],st=S.sel.includes(id)?"s":o.has(id)?"o":"f";
-g+=`<g data-seat="${id}" data-st="${st}" role="button" tabindex="0" aria-label="Стол ${n}, место ${i+1}, ${st==="s"?"выбрано":st==="o"?"занято":"свободно"}"><circle cx="${x}" cy="${y}" r="21" fill="transparent"/>${sg(x,y,st)}</g>`})});
-return `<svg viewBox="0 0 358 340" width="100%"><rect x="1" y="1" width="356" height="338" rx="22" fill="${K.card}" stroke="${K.bd}"/><rect x="119" y="14" width="120" height="34" rx="10" fill="${K.br}"/><text x="179" y="35" text-anchor="middle" font-size="11" font-weight="700" fill="${K.on}">Сцена · пианино</text>${g}<text x="179" y="324" text-anchor="middle" font-size="11" font-weight="700" fill="${K.mu}">ВХОД</text></svg>`}
+function mapSvg(e){const o=new Set(taken(e)),vb=HALL.vb;let g=`<rect x="${vb[0]}" y="${vb[1]}" width="${vb[2]}" height="${vb[3]}" fill="${K.card}"/>`;
+HALL.rects.forEach(r=>{g+=`<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" rx="10" fill="${r[5]==="stage"?K.br:K.mu}"/><text x="${r[0]+r[2]/2}" y="${r[1]+r[3]/2+4}" text-anchor="middle" font-size="11" font-weight="700" fill="${K.on}">${esc(r[4])}</text>`});
+HALL.tables.forEach(t=>{g+=`<circle cx="${t[1]}" cy="${t[2]}" r="${t[3]}" fill="${K.bd}"/><text x="${t[1]}" y="${t[2]+5}" text-anchor="middle" font-size="13" font-weight="700" fill="${K.ink}">${esc(t[0])}</text>`});
+HALL.seats.forEach(q=>{const id=q[0],st=S.sel.includes(id)?"s":o.has(id)?"o":"f";
+g+=`<g data-seat="${id}" data-st="${st}" role="button" tabindex="0" aria-label="Место ${id}, ${st==="s"?"выбрано":st==="o"?"занято":"свободно"}"><circle cx="${q[1]}" cy="${q[2]}" r="13" fill="transparent"/>${sg(q[1],q[2],st)}</g>`});
+return `<div style="border:1px solid var(--bd);border-radius:22px;overflow-x:auto;background:var(--card);-webkit-overflow-scrolling:touch"><svg viewBox="${vb.join(" ")}" width="${Math.round(vb[2]*1.15)}" height="${Math.round(vb[3]*1.15)}" style="display:block;max-width:none">${g}</svg></div><div class="m" style="text-align:center">Карту можно прокрутить вбок</div>`}
 const lg=(s,t)=>`<div class="row" style="gap:6px"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">${sg(12,12,s)}</svg><span class="m">${t}</span></div>`;
 function evCard(e){const d=dd(e.date),b=DB.book[e.id],l=left(e);
 const act=b?`<button class="bt o" data-act="ev" data-p="${e.id}">Изменить запись</button>`:l>0?`<button class="bt" data-act="ev" data-p="${e.id}">Записаться</button>`:DB.wait[e.id]?`<button class="bt o" disabled>Вы в листе ожидания</button>`:`<button class="bt o" data-act="wait" data-p="${e.id}">В лист ожидания</button>`;
@@ -227,7 +229,7 @@ return `${hdr("Выбор мест")}<div class="dk" style="padding:12px 16px"><
 <div class="k row sb" style="padding:12px 16px"><div><b>${n?"Выбрано: "+n+" "+pl(n,["место","места","мест"]):"Выберите места"}</b><div class="m">Можно до 6 мест</div></div>${n?'<button class="ch" data-act="clear">Сбросить</button>':""}</div>
 <div class="sticky"><button class="bt" style="height:52px;font-size:16px" data-act="book" ${n?"":"disabled"}>${n?"Забронировать "+n+" "+pl(n,["место","места","мест"]):"Забронировать"}</button></div>`},
 done:()=>{const e=EVENTS.find(x=>x.id===S.p),d=dd(e.date),b=DB.book[e.id]||[];
-return `<h1 class="h">Вы записаны</h1><div class="dk"><b style="font-size:17px">${esc(e.title)}</b><div class="m" style="margin-top:4px">${d.w}, ${d.n} ${d.m} · ${e.time}</div><div class="m">Мест: ${b.length} (${b.map(x=>"стол "+x[0]).filter((v,i,a)=>a.indexOf(v)===i).join(", ")})</div></div>
+return `<h1 class="h">Вы записаны</h1><div class="dk"><b style="font-size:17px">${esc(e.title)}</b><div class="m" style="margin-top:4px">${d.w}, ${d.n} ${d.m} · ${e.time}</div><div class="m">Мест: ${b.length} (${[...new Set(b.map(x=>x.slice(0,-1)))].map(t=>"стол "+t).join(", ")})</div></div>
 <div class="m" style="line-height:1.5">Если планы изменятся, отмените запись, чтобы места достались другим.</div><button class="bt" data-sub="route">Как добраться</button><button class="bt o" data-act="back">Готово</button><button class="bt o" style="border-color:var(--bd2);color:var(--mu)" data-act="cancel">Отменить запись</button>`},
 menu:()=>{if(!MENU[S.cat])S.cat=Object.keys(MENU)[0];return `<div><h1 class="h">Меню</h1><div class="m" style="margin-top:6px">Цены ориентировочные. Заказ у стойки.</div></div><div class="row hs" style="gap:8px">${Object.keys(MENU).map(k=>`<button class="ch ${k===S.cat?"on":""}" data-act="cat" data-p="${esc(k)}">${esc(k)}</button>`).join("")}</div>
 <div class="pg">${MENU[S.cat].map(menuCard).join("")||'<div class="m">В категории пока пусто</div>'}</div>
@@ -277,7 +279,7 @@ const bk=Object.keys(DB.book).filter(k=>EVENTS.some(e=>e.id===k)&&(DB.book[k]||[
 return{rw,best,fav,visits:v.length,first:v[0],bk}}
 const tgl2=(k,l,sub)=>`<div class="row sb"><div style="min-width:0"><b>${l}</b><div class="m">${sub}</div></div><button class="tgl ${CFG[k]?"on":""}" role="switch" aria-checked="${!!CFG[k]}" aria-label="${l}" data-act="ptog" data-p="${k}"><i></i></button></div>`;
 V.profile=()=>{const u=inTg&&tg.initDataUnsafe&&tg.initDataUnsafe.user,nm=u&&u.first_name?u.first_name:"Гость",st=stats(),sk=streak();
-const mine=st.bk.map(k=>{const e=EVENTS.find(x=>x.id===k),d=dd(e.date),b=DB.book[k],n=b.length,tb=[...new Set(b.map(x=>x[0]))].join(", ");return `<div class="k col" style="gap:14px"><div class="row"><div class="dt"><b>${d.n}</b><span>${d.ms}</span></div><div style="min-width:0"><b>${esc(e.title)}</b><div class="m" style="margin-top:2px">${d.w}, ${e.time} · ${n} ${pl(n,["место","места","мест"])}, стол ${tb}</div></div></div><div class="row" style="gap:8px"><button class="bt o" style="height:42px;font-size:14px" data-act="ev" data-p="${e.id}">Изменить</button><button class="bt o" style="height:42px;font-size:14px;color:var(--mu);border-color:var(--bd2)" data-act="cancelp" data-p="${e.id}">Отменить</button></div></div>`}).join("");
+const mine=st.bk.map(k=>{const e=EVENTS.find(x=>x.id===k),d=dd(e.date),b=DB.book[k],n=b.length,tb=[...new Set(b.map(x=>x.slice(0,-1)))].join(", ");return `<div class="k col" style="gap:14px"><div class="row"><div class="dt"><b>${d.n}</b><span>${d.ms}</span></div><div style="min-width:0"><b>${esc(e.title)}</b><div class="m" style="margin-top:2px">${d.w}, ${e.time} · ${n} ${pl(n,["место","места","мест"])}, стол ${tb}</div></div></div><div class="row" style="gap:8px"><button class="bt o" style="height:42px;font-size:14px" data-act="ev" data-p="${e.id}">Изменить</button><button class="bt o" style="height:42px;font-size:14px;color:var(--mu);border-color:var(--bd2)" data-act="cancelp" data-p="${e.id}">Отменить</button></div></div>`}).join("");
 const hist=DB.hist.slice(0,5).map(x=>`<div class="row sb" style="padding:10px 0;border-top:1px solid var(--bd)"><span style="font-size:14px">${x.n}</span><span class="m">${x.d}</span></div>`).join("");
 return `<h1 class="h">Профиль</h1>
 <div class="k row" style="gap:16px"><div class="av">${esc(nm[0].toUpperCase())}</div><div style="min-width:0"><b style="font-size:18px">${esc(nm)}</b><div class="m" style="margin-top:2px">${u&&u.username?"@"+esc(u.username)+" · ":""}${st.first?"с нами с "+dd(st.first).n+" "+dd(st.first).m:"пока без визитов"}</div></div></div>
