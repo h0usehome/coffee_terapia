@@ -75,7 +75,7 @@ textarea.fl{resize:vertical;line-height:1.5}
 /* ===== Настройки кофейни (замените на свои) ===== */
 const ADDR="Минск, Туровского 24";
 /* Telegram ID администраторов (свой ID виден на главной, пока список пуст). Проверка на клиенте только прячет кнопку: настоящую проверку делает сервер. */
-const ADMINS=[789419620];
+const ADMINS=[];
 const CUPS_MAX=15, REW={5:"конфета",10:"круассан",15:"кофе в подарок"};
 /* Демо-коды для проверки. В рабочей версии коды проверяет сервер. */
 const VALID=["TR-7K4Q-92","TR-1M8X-45","TR-9P2D-17"];
@@ -107,7 +107,13 @@ if(inTg){tg.ready();tg.expand();}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const LS={g(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const DB=Object.assign({cups:0,hist:[],used:[],visits:[],book:{},wait:{}},LS.g("tdb",{}));
-const save=()=>LS.s("tdb",DB);
+const cloud=(()=>{try{return inTg&&tg.CloudStorage&&tg.isVersionAtLeast("6.9")?tg.CloudStorage:null}catch(e){return null}})();
+const save=()=>{DB.ts=Date.now();DB.hist=DB.hist.slice(0,20);DB.used=DB.used.slice(-100);LS.s("tdb",DB);if(cloud){try{cloud.setItem("tdb",JSON.stringify(DB))}catch(e){}}};
+const EMPTY=()=>({cups:0,hist:[],used:[],visits:[],book:{},wait:{}});
+/* Данные гостя хранятся в облаке Telegram и одинаковы на всех устройствах; побеждает более свежая версия */
+function syncCloud(){if(!cloud)return;cloud.getItem("tdb",(err,v)=>{try{const c=v?JSON.parse(v):null;
+if(c&&(c.ts||0)>(DB.ts||0)){Object.assign(DB,EMPTY(),c);LS.s("tdb",DB);render()}
+else if(DB.ts||DB.cups||DB.visits.length||Object.keys(DB.book).length){if(!DB.ts)DB.ts=1;cloud.setItem("tdb",JSON.stringify(DB))}}catch(e){}})}
 /* Контент (новости, меню, вечера). Сейчас хранится на устройстве. С сервером этот блок заменяется запросами к API. */
 let NEWS=[{id:"n1",title:"Музыкальный вечер 19 ноября",text:"Живая музыка в кофейне. Места ограничены, запишитесь заранее в разделе «Вечера».",date:"2026-11-16",pin:1},{id:"n2",title:"Обеды с 12:00",text:"Полезная тарелка по будням с 12:00, пока не съедят.",date:"2026-11-10",pin:0},{id:"n3",title:"Осенние напитки",text:"Загляните за сезонными напитками. Подробности скоро.",date:"2026-11-03",pin:0}];
 {const c=LS.g("tct2",null);if(c){MENU=c.menu;EVENTS=c.events;NEWS=c.news}}
@@ -213,7 +219,7 @@ ${S.msg?`<div class="msg ${S.msg[0]==="bad"?"bad":""}" role="status">${S.msg[1]}
 <button class="bt" data-act="scan">Сканировать QR на чеке</button><div class="m" style="text-align:center">или введите код вручную</div>
 <input id="code" class="fi" aria-label="Код с чека" placeholder="TR-0000-00" value="${esc(S.code)}" autocomplete="off" autocapitalize="characters">
 <button class="bt o" style="height:52px" data-act="addcode">Добавить кружку</button>
-<div class="k m" style="line-height:1.6">Для теста: ${VALID.join(", ")}</div>`,
+${ADMINS.length?"":`<div class="k m" style="line-height:1.6">Для теста: ${VALID.join(", ")}</div>`}`,
 events:()=>`<div><h1 class="h">Вечера</h1><div class="m" style="margin-top:6px">Живая музыка в Терапии. Нужна запись, мест немного.</div></div>${EVENTS.map(evCard).join("")}`,
 seats:()=>{const e=EVENTS.find(x=>x.id===S.p),d=dd(e.date),n=S.sel.length;
 return `${hdr("Выбор мест")}<div class="dk" style="padding:12px 16px"><b>${esc(e.title)}${e.tag?" · "+esc(e.tag.toLowerCase()):""}</b><div class="m">${d.w}, ${d.n} ${d.m} · ${e.time}</div></div>${mapSvg(e)}
@@ -267,11 +273,11 @@ form:()=>{const F=FORMS[S.form.kind],v=S.form.v;return `${hdr(F.t)}${S.msg?`<div
 function stats(){const v=[...new Set(DB.visits)].sort(),ws=[...new Set(v.map(widx))].sort((a,b)=>a-b);let best=0,run=0,p=null;ws.forEach(x=>{run=p!==null&&x===p+1?run+1:1;if(run>best)best=run;p=x});
 let rw=0;for(let n=1;n<=DB.cups;n++)if(REW[((n-1)%CUPS_MAX)+1])rw++;
 const wd=[0,0,0,0,0,0,0];v.forEach(x=>wd[new Date(x+"T12:00:00").getDay()]++);const mx=Math.max(...wd),fav=mx?["воскресенье","понедельник","вторник","среду","четверг","пятницу","субботу"][wd.indexOf(mx)]:"";
-const bk=Object.keys(DB.book).filter(k=>EVENTS.some(e=>e.id===k));
+const bk=Object.keys(DB.book).filter(k=>EVENTS.some(e=>e.id===k)&&(DB.book[k]||[]).length);
 return{rw,best,fav,visits:v.length,first:v[0],bk}}
 const tgl2=(k,l,sub)=>`<div class="row sb"><div style="min-width:0"><b>${l}</b><div class="m">${sub}</div></div><button class="tgl ${CFG[k]?"on":""}" role="switch" aria-checked="${!!CFG[k]}" aria-label="${l}" data-act="ptog" data-p="${k}"><i></i></button></div>`;
 V.profile=()=>{const u=inTg&&tg.initDataUnsafe&&tg.initDataUnsafe.user,nm=u&&u.first_name?u.first_name:"Гость",st=stats(),sk=streak();
-const mine=st.bk.map(k=>{const e=EVENTS.find(x=>x.id===k),d=dd(e.date);return `<button class="row sb" style="width:100%;text-align:left;padding:10px 0;border-top:1px solid var(--bd)" data-act="ev" data-p="${e.id}"><span style="min-width:0"><b style="font-size:14px">${esc(e.title)}</b><span class="m" style="display:block">${d.n} ${d.m} · мест: ${DB.book[k].length}</span></span><span class="m">Изменить</span></button>`}).join("");
+const mine=st.bk.map(k=>{const e=EVENTS.find(x=>x.id===k),d=dd(e.date),b=DB.book[k],n=b.length,tb=[...new Set(b.map(x=>x[0]))].join(", ");return `<div class="k col" style="gap:14px"><div class="row"><div class="dt"><b>${d.n}</b><span>${d.ms}</span></div><div style="min-width:0"><b>${esc(e.title)}</b><div class="m" style="margin-top:2px">${d.w}, ${e.time} · ${n} ${pl(n,["место","места","мест"])}, стол ${tb}</div></div></div><div class="row" style="gap:8px"><button class="bt o" style="height:42px;font-size:14px" data-act="ev" data-p="${e.id}">Изменить</button><button class="bt o" style="height:42px;font-size:14px;color:var(--mu);border-color:var(--bd2)" data-act="cancelp" data-p="${e.id}">Отменить</button></div></div>`}).join("");
 const hist=DB.hist.slice(0,5).map(x=>`<div class="row sb" style="padding:10px 0;border-top:1px solid var(--bd)"><span style="font-size:14px">${x.n}</span><span class="m">${x.d}</span></div>`).join("");
 return `<h1 class="h">Профиль</h1>
 <div class="k row" style="gap:16px"><div class="av">${esc(nm[0].toUpperCase())}</div><div style="min-width:0"><b style="font-size:18px">${esc(nm)}</b><div class="m" style="margin-top:2px">${u&&u.username?"@"+esc(u.username)+" · ":""}${st.first?"с нами с "+dd(st.first).n+" "+dd(st.first).m:"пока без визитов"}</div></div></div>
@@ -279,7 +285,7 @@ return `<h1 class="h">Профиль</h1>
 <div class="k stat"><b>${DB.cups}</b><span class="m">кружек всего</span></div><div class="k stat"><b>${st.rw}</b><span class="m">наград получено</span></div>
 <div class="k stat"><b>${sk}</b><span class="m">${pl(sk,["неделя","недели","недель"])} подряд</span></div><div class="k stat"><b>${st.best}</b><span class="m">рекорд серии, недель</span></div></div>
 <div class="k col" style="gap:0">${[["Визитов в кофейню",st.visits],["Записей на вечера",st.bk.length],["Любимый день",st.fav||"—"]].map((r,i)=>`<div class="row sb" style="padding:12px 0;${i?"border-top:1px solid var(--bd)":""}"><span class="m" style="font-size:14px">${r[0]}</span><b>${r[1]}</b></div>`).join("")}</div></div>
-<div class="sec"><h2 class="st">Мои записи на вечера</h2><div class="k" style="padding:6px 18px">${mine||'<div class="m" style="padding:14px 0">Пока нет записей</div>'}</div></div>
+<div class="sec"><h2 class="st">Мои записи на вечера</h2>${mine||'<div class="k m">Пока нет записей. Запишитесь на вечер во вкладке «Вечера».</div>'}</div>
 <div class="sec"><h2 class="st">Последние кружки</h2><div class="k" style="padding:6px 18px">${hist||'<div class="m" style="padding:14px 0">Пока пусто. Добавьте код с чека.</div>'}</div></div>
 <div class="sec"><h2 class="st">Настройки</h2><div class="k col"><div><b style="display:block;margin-bottom:10px">Тема</b><div class="seg" role="group" aria-label="Тема">${[["auto","Авто"],["light","Светлая"],["dark","Тёмная"]].map(x=>`<button class="${CFG.theme===x[0]?"on":""}" data-act="theme" data-p="${x[0]}">${x[1]}</button>`).join("")}</div></div>${tgl2("anim","Анимации","Плавные переходы между экранами")}</div></div>
 ${isAdmin()?'<button class="bt" data-sub="admin">Панель администратора</button>':""}
@@ -306,6 +312,7 @@ else if(a==="ev"){S.p=d.p;S.sel=(DB.book[d.p]||[]).slice();S.sub="seats"}
 else if(a==="clear")S.sel=[];
 else if(a==="book"){DB.book[S.p]=S.sel.slice();save();S.sub="done"}
 else if(a==="cancel"){delete DB.book[S.p];save();S.sub=null}
+else if(a==="cancelp"){const m="Отменить запись на этот вечер?",id=d.p,ok=()=>{delete DB.book[id];save();render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
 else if(a==="wait"){DB.wait[d.p]=1;save()}
 else if(a==="cat")S.cat=d.p;
 else if(a==="rtt")S.rtt=d.p;
@@ -320,7 +327,7 @@ else if(a==="fsave")fsave();
 else if(a==="adel"){const i=+d.i,k=d.p,m="Удалить? Это действие нельзя отменить.",ok=()=>{if(k==="news")NEWS.splice(i,1);else if(k==="event")EVENTS.splice(i,1);else MENU[S.acat].splice(i,1);saveCT();render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
 else if(a==="theme"){CFG.theme=d.p;LS.s("tcfg",CFG);applyTheme()}
 else if(a==="ptog"){CFG[d.p]=CFG[d.p]?0:1;LS.s("tcfg",CFG);applyTheme()}
-else if(a==="wipe"){const m="Удалить кружки, записи и историю на этом устройстве?",ok=()=>{["tdb"].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});Object.assign(DB,{cups:0,hist:[],used:[],visits:[],book:{},wait:{}});render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
+else if(a==="wipe"){const m="Удалить кружки, записи и историю на этом устройстве?",ok=()=>{Object.assign(DB,EMPTY());save();render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
 else if(a==="addcode"){S.code=$("#code").value;S.msg=addCode(S.code);if(S.msg[0]==="ok")S.code="";}
 else if(a==="scan"){if(inTg&&tg.showScanQrPopup){tg.showScanQrPopup({text:"Наведите на QR с чека"},txt=>{const m=String(txt).toUpperCase().match(/TR-[A-Z0-9]{4}-[0-9]{2}/);S.msg=addCode(m?m[0]:txt);render();return true})}else{S.msg=["bad","Сканер доступен только внутри Telegram. Введите код вручную"]}}
 render()});
@@ -331,7 +338,7 @@ document.addEventListener("touchmove",e=>{if(e.touches.length>1)e.preventDefault
 document.addEventListener("wheel",e=>{if(e.ctrlKey)e.preventDefault()},{passive:false});
 try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{if(CFG.theme==="auto"){applyTheme();render()}})}catch(e){}
 if(inTg)tg.BackButton.onClick(()=>{back();render()});
-applyTheme();render();
+applyTheme();render();syncCloud();
 </script>
 </body>
 </html>
