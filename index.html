@@ -2383,6 +2383,7 @@ var qrcode = function() {
 const ADDR="Минск, улица Кирилла Туровского, 24";           /* адрес для поиска в картах */
 const ADDR_COPY="Минск, улица Кирилла Туровского, 24, пом. 209";  /* адрес для копирования */
 const COORDS=[53.931015,27.653107];  /* точные координаты [широта, долгота], например [53.9006, 27.5590]: тогда маршрут строится точно в эту точку */
+const EDA_URL="https://eda.yandex.ru/restaurant/terapiya_p6t45";
 const YA_OID="198130812011";  /* ID организации в Яндекс Картах: маршрут заканчивается именно в кофейне, а не у дома */
 const YA_ORG="https://yandex.by/maps/org/terapiya/"+YA_OID+"/";    /* ссылка на страницу кофейни в Яндекс Картах (необязательно) */
 /* Telegram ID администраторов (свой ID виден на главной, пока список пуст). Проверка на клиенте только прячет кнопку: настоящую проверку делает сервер. */
@@ -2570,7 +2571,7 @@ return `<h1 class="h">Вы записаны</h1><div class="dk"><b style="font-s
 <div class="m" style="line-height:1.5">Если планы изменятся, отмените запись, чтобы места достались другим.</div><button class="bt" data-sub="route">Как добраться</button><button class="bt o" data-act="back">Готово</button><button class="bt o" style="border-color:var(--bd2);color:var(--mu)" data-act="cancel">Отменить запись</button>`},
 menu:()=>{if(!MENU[S.cat])S.cat=Object.keys(MENU)[0];return `<div><h1 class="h">Меню</h1><div class="m" style="margin-top:6px">Цены ориентировочные. Заказ у стойки.</div></div><div class="row hs" style="gap:8px">${Object.keys(MENU).map(k=>`<button class="ch ${k===S.cat?"on":""}" data-act="cat" data-p="${esc(k)}">${esc(k)}</button>`).join("")}</div>
 <div class="pg">${MENU[S.cat].map(menuCard).join("")||'<div class="m">В категории пока пусто</div>'}</div>
-<div class="k row sb" style="border-style:dashed"><div><b style="font-size:14px">Доставка</b><div class="m">Через Яндекс Еду — скоро</div></div><span class="ch">Скоро</span></div>`},
+<button class="k row sb" style="width:100%;text-align:left;cursor:pointer" data-act="eda"><div><b style="font-size:14px">Доставка</b><div class="m">Заказать в Яндекс Еде</div></div><span class="ch on">Открыть</span></button>`},
 route:()=>`${hdr("Как нас найти")}
 <div class="k" style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:26px 18px;text-align:center"><div style="width:64px;height:64px;border-radius:50%;background:var(--br);color:var(--on);display:flex;align-items:center;justify-content:center">${ic('<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',30)}</div><b style="font-size:18px">Туровского, 24, пом. 209</b><div class="m">Минск · Маяк Минска</div></div>
 <div class="k col" style="gap:6px"><b>Как нас найти</b><div class="m" style="line-height:1.5">Вход со стороны пешеходного бульвара, цокольный этаж</div><div class="m">С 7:30 свежие круассаны, открыто до 22:00</div></div>
@@ -2669,6 +2670,7 @@ else if(a==="cat")S.cat=d.p;
 else if(a==="rtt")S.rtt=d.p;
 else if(a==="route")open(routeUrl());
 else if(a==="gmap")open(gmapUrl());
+else if(a==="eda")open(EDA_URL);
 else if(a==="map")open(mapUrl());
 else if(a==="copy"){copyText(ADDR_COPY);return}
 else if(a==="newsopen"){S.p=d.p;S.sub="newsitem"}
