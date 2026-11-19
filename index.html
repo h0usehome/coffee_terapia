@@ -2383,7 +2383,7 @@ var qrcode = function() {
 const ADDR="Минск, улица Кирилла Туровского, 24";           /* адрес для поиска в картах */
 const ADDR_COPY="Минск, улица Кирилла Туровского, 24, пом. 209";  /* адрес для копирования */
 const COORDS=null;  /* точные координаты [широта, долгота], например [53.9006, 27.5590]: тогда маршрут строится точно в эту точку */
-const YA_ORG="";    /* ссылка на страницу кофейни в Яндекс Картах (необязательно) */
+const YA_ORG="https://yandex.by/maps/org/terapiya/198130812011/";    /* ссылка на страницу кофейни в Яндекс Картах (необязательно) */
 /* Telegram ID администраторов (свой ID виден на главной, пока список пуст). Проверка на клиенте только прячет кнопку: настоящую проверку делает сервер. */
 const ADMINS=[];
 const CUPS_MAX=15, REW={5:"конфета",10:"круассан",15:"кофе в подарок"};
@@ -2446,9 +2446,9 @@ const ic=(p,s=22,w=2)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill
 const CUP='<path d="M5 9h11v4a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5zM16 10h2a2 2 0 0 1 0 4h-2"/>',CANDY='<circle cx="12" cy="12" r="4"/><path d="M8 12L3 9v6zM16 12l5-3v6z"/>',CROI='<path d="M3 16c1-6 5-9 9-9s8 3 9 9c-2-1-3-3-4-5l-2 2-3-4-3 4-2-2c-1 2-2 4-4 5z"/>',CHECK='<path d="M5 12l5 5 9-10"/>';
 const TABS=[["menu","Меню",CUP],["events","Вечера",'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/>'],["home","Главная",'<path d="M3 11l9-8 9 8v10H3z"/>'],["card","Карта",'<rect x="3" y="6" width="18" height="12" rx="3"/><path d="M3 10h18"/>'],["profile","Профиль",'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 15-5 16 0"/>']];
 const dest=()=>COORDS?COORDS[0]+","+COORDS[1]:ADDR;
-const routeUrl=()=>"https://yandex.ru/maps/?rtext=~"+encodeURIComponent(dest())+"&rtt="+S.rtt;
+const routeUrl=()=>"https://yandex.by/maps/?rtext=~"+encodeURIComponent(dest())+"&rtt="+S.rtt;
 const gmapUrl=()=>"https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(dest())+"&travelmode="+({pd:"walking",auto:"driving",mt:"transit"}[S.rtt]||"walking");
-const mapUrl=()=>YA_ORG||(COORDS?"https://yandex.ru/maps/?pt="+COORDS[1]+","+COORDS[0]+"&z=17&l=map":"https://yandex.ru/maps/?text="+encodeURIComponent(ADDR));
+const mapUrl=()=>YA_ORG||(COORDS?"https://yandex.by/maps/?pt="+COORDS[1]+","+COORDS[0]+"&z=17&l=map":"https://yandex.by/maps/?text="+encodeURIComponent(ADDR));
 function copyText(t){const ok=()=>toast("Адрес скопирован"),bad=()=>toast("Не удалось скопировать. Адрес: "+t);
 const old=()=>{try{const a=document.createElement("textarea");a.value=t;a.setAttribute("readonly","");a.style.cssText="position:fixed;opacity:0;top:0";document.body.appendChild(a);a.select();const r=document.execCommand("copy");document.body.removeChild(a);r?ok():bad()}catch(e){bad()}};
 try{navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t).then(ok,old):old()}catch(e){old()}}
@@ -2572,7 +2572,7 @@ menu:()=>{if(!MENU[S.cat])S.cat=Object.keys(MENU)[0];return `<div><h1 class="h">
 <div class="k row sb" style="border-style:dashed"><div><b style="font-size:14px">Доставка</b><div class="m">Через Яндекс Еду — скоро</div></div><span class="ch">Скоро</span></div>`},
 route:()=>`${hdr("Как нас найти")}
 <div class="k" style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:26px 18px;text-align:center"><div style="width:64px;height:64px;border-radius:50%;background:var(--br);color:var(--on);display:flex;align-items:center;justify-content:center">${ic('<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',30)}</div><b style="font-size:18px">Туровского, 24, пом. 209</b><div class="m">Минск · Маяк Минска</div></div>
-<div class="k col" style="gap:6px"><b>Часы работы</b><div class="m">С 7:30 свежие круассаны, открыто до 22:00</div></div>
+<div class="k col" style="gap:6px"><b>Как нас найти</b><div class="m" style="line-height:1.5">Вход со стороны пешеходного бульвара, цокольный этаж</div><div class="m">С 7:30 свежие круассаны, открыто до 22:00</div></div>
 <div class="sec"><h2 class="st">Как добраться</h2><div class="row" style="gap:8px">${[["pd","Пешком"],["auto","На авто"],["mt","Транспорт"]].map(x=>`<button class="ch ${S.rtt===x[0]?"on":""}" data-act="rtt" data-p="${x[0]}">${x[1]}</button>`).join("")}</div></div>
 <button class="bt" style="height:52px;font-size:16px" data-act="route">Маршрут в Яндекс Картах</button><button class="bt o" data-act="gmap">Маршрут в Google Картах</button><button class="bt o" data-act="map">Показать на карте</button><button class="bt o" style="border-color:var(--bd2);color:var(--mu)" data-act="copy">Скопировать адрес</button>`
 };
