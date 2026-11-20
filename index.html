@@ -2613,7 +2613,7 @@ else if(k==="item"){const a={n:v.name.trim(),d:(v.desc||"").trim(),p:parseFloat(
 else if(k==="event"){const o={id:v.id||"e"+Date.now(),title:v.title.trim(),tag:(v.tag||"").trim(),date:v.date,time:(v.time||"19:00").trim(),desc:(v.desc||"").trim(),occ:v.occ||[]};i>=0?EVENTS[i]=o:EVENTS.push(o);EVENTS.sort((a,b)=>a.date.localeCompare(b.date))}
 else{const n=v.name.trim();if(!MENU[n])MENU[n]=[];S.acat=n}
 saveCT(k==="news"?"news":k==="event"?"events":"menu");S.sub=F.b;S.msg=null}
-const photoBlock=v=>`<div class="col" style="gap:10px">${v.img?`<div class="k" style="padding:0;overflow:hidden"><div class="ncv"><img src="${esc(v.img)}" alt="" onerror="this.remove()"></div></div>`:""}<label class="bt o" style="display:flex;align-items:center;justify-content:center;cursor:pointer">${v.img?"Заменить фото":"Выбрать фото с телефона"}<input type="file" id="f_file" accept="image/*" hidden></label>${v.img?'<button class="ch" data-act="rmimg" style="align-self:flex-start">Убрать фото</button>':""}</div>`;
+const photoBlock=(v,sq)=>`<div class="col" style="gap:10px">${v.img?`<div class="k" style="padding:0;overflow:hidden${sq?";max-width:200px":""}"><div class="${sq?"pic":"ncv"}"><img src="${esc(v.img)}" alt="" onerror="this.remove()"></div></div>`:""}<label class="bt o" style="display:flex;align-items:center;justify-content:center;cursor:pointer">${v.img?"Заменить фото":"Выбрать фото с телефона"}<input type="file" id="f_file" accept="image/*" hidden></label>${v.img?'<button class="ch" data-act="rmimg" style="align-self:flex-start">Убрать фото</button>':""}</div>`;
 const tile=(s,t,d)=>`<button class="k" style="text-align:left" data-sub="${s}"><b>${t}</b><div class="m" style="margin-top:4px">${d}</div></button>`;
 Object.assign(V,{
 barista:()=>{const left=Math.max(0,Math.round((BC.exp-Date.now())/1000));let qr="";
@@ -2628,7 +2628,7 @@ admin:()=>`${hdr("Администратор")}${NOTE}${tile("anews","Новос
 anews:()=>`${hdr("Новости")}${sortN().map(x=>rowA(x.title,(x.pin?"Закреплено · ":"")+x.date,"news",NEWS.indexOf(x))).join("")||'<div class="m">Новостей пока нет</div>'}${addBar("news","Добавить новость")}`,
 amenu:()=>{if(!MENU[S.acat])S.acat=Object.keys(MENU)[0];return `${hdr("Меню")}<div class="row hs" style="gap:8px">${Object.keys(MENU).map(k=>`<button class="ch ${k===S.acat?"on":""}" data-act="acat" data-p="${esc(k)}">${esc(k)}</button>`).join("")}<button class="ch" data-act="aform" data-p="cat" data-i="-1">+ Категория</button></div>${MENU[S.acat].map((x,i)=>rowA(x.n,esc(fmtP(x)),"item",i)).join("")||'<div class="m">В категории пока пусто</div>'}${addBar("item","Добавить позицию")}`},
 aevents:()=>`${hdr("Вечера")}${EVENTS.map((e,i)=>rowA(e.title,e.date+" · "+e.time,"event",i)).join("")}${addBar("event","Добавить вечер")}`,
-form:()=>{const F=FORMS[S.form.kind],v=S.form.v;return `${hdr(F.t)}${S.msg?`<div class="msg bad" role="alert">${S.msg[1]}</div>`:""}${F.f.map(f=>(f[0]==="img"&&String(v.img||"").startsWith("data:"))?"":f[2]==="bool"?`<button class="ch ${v[f[0]]?"on":""}" data-act="ftog" data-p="${f[0]}" style="align-self:flex-start">${f[1]}${v[f[0]]?": да":""}</button>`:`<div><label class="lb" for="f_${f[0]}">${f[1]}</label>${f[2]==="area"?`<textarea id="f_${f[0]}" class="fl" rows="5">${esc(v[f[0]]||"")}</textarea>`:`<input id="f_${f[0]}" class="fl" type="${f[2]==="date"?"date":"text"}" value="${esc(v[f[0]]||"")}">`}</div>`).join("")}${S.form.kind==="news"?photoBlock(v):""}<div class="sticky"><button class="bt" data-act="fsave">Сохранить</button></div>`}
+form:()=>{const F=FORMS[S.form.kind],v=S.form.v;return `${hdr(F.t)}${S.msg?`<div class="msg bad" role="alert">${S.msg[1]}</div>`:""}${F.f.map(f=>(f[0]==="img"&&String(v.img||"").startsWith("data:"))?"":f[2]==="bool"?`<button class="ch ${v[f[0]]?"on":""}" data-act="ftog" data-p="${f[0]}" style="align-self:flex-start">${f[1]}${v[f[0]]?": да":""}</button>`:`<div><label class="lb" for="f_${f[0]}">${f[1]}</label>${f[2]==="area"?`<textarea id="f_${f[0]}" class="fl" rows="5">${esc(v[f[0]]||"")}</textarea>`:`<input id="f_${f[0]}" class="fl" type="${f[2]==="date"?"date":"text"}" value="${esc(v[f[0]]||"")}">`}</div>`).join("")}${S.form.kind==="news"||S.form.kind==="item"?photoBlock(v,S.form.kind==="item"):""}<div class="sticky"><button class="bt" data-act="fsave">Сохранить</button></div>`}
 });
 
 /* ===== Профиль ===== */
@@ -2706,9 +2706,30 @@ else if(a==="addcode"){submitCode($("#code").value);return}
 else if(a==="newqr"){bLast=0;BC.code=null;BC.err="";newCode()}
 else if(a==="scan"){if(inTg&&tg.showScanQrPopup){tg.showScanQrPopup({text:"Наведите на QR баристы"},txt=>{const m=String(txt).toUpperCase().match(/TR-[A-Z0-9]{6}/);submitCode(m?m[0]:String(txt));return true})}else{S.msg=["bad","Сканер доступен только внутри Telegram. Введите код вручную"]}}
 render()});
-document.addEventListener("change",e=>{const f=e.target;if(!f||f.id!=="f_file"||!f.files||!f.files[0])return;const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,900/im.width),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);rf();const du=c.toDataURL("image/jpeg",.75);
-if(!inTg){S.form.v.img=du;render();return}
-toast("Загружаем фото…");api("upload",{image:du}).then(r=>{if(r.url){S.form.v.img=r.url;render()}else toast(r.error||"Не удалось загрузить фото")}).catch(()=>toast("Нет связи с сервером"))};im.src=rd.result};rd.readAsDataURL(f.files[0])});
+/* Обрезка фото: двигаем фото в рамке нужной пропорции и выбираем видимую часть */
+function cropPhoto(src,ratio,done){const W=Math.min(innerWidth-32,420),H=Math.round(W/ratio),im=new Image();
+im.onload=()=>{const iw=im.naturalWidth,ih=im.naturalHeight,base=Math.max(W/iw,H/ih);let z=1,x=(W-iw*base)/2,y=(H-ih*base)/2;
+const ov=document.createElement("div");ov.id="crop";ov.style.cssText="position:fixed;inset:0;z-index:99;background:rgba(20,10,8,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;touch-action:none";
+ov.innerHTML=`<div style="color:#fff;font-size:14px;text-align:center;line-height:1.4">Двигайте фото пальцем.<br>Масштаб меняется ползунком.</div><div id="cf" style="width:${W}px;height:${H}px;position:relative;overflow:hidden;border-radius:14px;background:#000;touch-action:none;cursor:grab"><img id="ci" alt="" draggable="false" style="position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;width:${iw}px;height:${ih}px;user-select:none;pointer-events:none"></div><input id="cz" type="range" min="1" max="4" step="0.01" value="1" style="width:${W}px" aria-label="Масштаб"><div style="display:flex;gap:10px;width:${W}px"><button class="bt o" id="cc" style="flex:1;background:var(--card)">Отмена</button><button class="bt" id="cd" style="flex:1">Готово</button></div>`;
+document.body.appendChild(ov);const img=$("#ci");img.src=src;
+const sc=()=>base*z,clamp=()=>{x=Math.min(0,Math.max(W-iw*sc(),x));y=Math.min(0,Math.max(H-ih*sc(),y))},
+paint=()=>{clamp();img.style.transform=`translate(${x}px,${y}px) scale(${sc()})`;$("#cz").value=z},
+setZ=n=>{n=Math.min(4,Math.max(1,n));const cx=(W/2-x)/sc(),cy=(H/2-y)/sc();z=n;x=W/2-cx*sc();y=H/2-cy*sc();paint()};
+paint();const P=new Map();let pd=0;const fr=$("#cf");
+fr.addEventListener("pointerdown",e=>{fr.setPointerCapture(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY]);if(P.size===2){const a=[...P.values()];pd=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])}});
+fr.addEventListener("pointermove",e=>{if(!P.has(e.pointerId))return;const o=P.get(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY]);
+if(P.size===2){const a=[...P.values()],d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);if(pd)setZ(z*d/pd);pd=d}else{x+=e.clientX-o[0];y+=e.clientY-o[1];paint()}});
+const up=e=>{P.delete(e.pointerId);pd=0};fr.addEventListener("pointerup",up);fr.addEventListener("pointercancel",up);
+fr.addEventListener("wheel",e=>{e.preventDefault();setZ(z*(e.deltaY<0?1.08:1/1.08))},{passive:false});
+$("#cz").addEventListener("input",e=>setZ(+e.target.value));
+$("#cc").addEventListener("click",()=>ov.remove());
+$("#cd").addEventListener("click",()=>{const OW=ratio>1.2?1280:900,c=document.createElement("canvas");c.width=OW;c.height=Math.round(OW/ratio);
+c.getContext("2d").drawImage(im,-x/sc(),-y/sc(),W/sc(),H/sc(),0,0,c.width,c.height);ov.remove();done(c.toDataURL("image/jpeg",.82))})};
+im.src=src}
+document.addEventListener("change",e=>{const f=e.target;if(!f||f.id!=="f_file"||!f.files||!f.files[0])return;const file=f.files[0],rd=new FileReader();
+rd.onload=()=>{rf();const ratio=S.form&&S.form.kind==="item"?1:16/9;f.value="";
+cropPhoto(rd.result,ratio,du=>{if(!inTg){S.form.v.img=du;render();return}
+toast("Загружаем фото…");api("upload",{image:du}).then(r=>{if(r.url){S.form.v.img=r.url;render()}else toast(r.error||"Не удалось загрузить фото")}).catch(()=>toast("Нет связи с сервером"))})};rd.readAsDataURL(file)});
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset&&e.target.dataset.seat){e.preventDefault();e.target.dispatchEvent(new MouseEvent("click",{bubbles:true}))}});
 /* Запрет масштабирования */
 ["gesturestart","gesturechange","gestureend"].forEach(n=>document.addEventListener(n,e=>e.preventDefault()));
