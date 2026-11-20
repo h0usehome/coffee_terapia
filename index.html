@@ -2428,7 +2428,7 @@ const save=()=>{DB.ts=Date.now();DB.hist=DB.hist.slice(0,20);DB.used=DB.used.sli
 const EMPTY=()=>({cups:0,hist:[],used:[],visits:[],book:{},wait:{}});
 /* Данные гостя хранятся в облаке Telegram и одинаковы на всех устройствах; побеждает более свежая версия */
 function syncCloud(){if(!cloud)return;cloud.getItem("tdb",(err,v)=>{try{const c=v?JSON.parse(v):null;
-if(c&&(c.ts||0)>(DB.ts||0)){{const k={cups:DB.cups,visits:DB.visits,hist:DB.hist};Object.assign(DB,EMPTY(),c,k)}LS.s("tdb",DB);render()}
+if(c&&(c.ts||0)>(DB.ts||0)){{const k={cups:DB.cups,visits:DB.visits,hist:DB.hist};Object.assign(DB,EMPTY(),c,k)}LS.s("tdb",DB);softRender()}
 else if(DB.ts||DB.cups||DB.visits.length||Object.keys(DB.book).length){if(!DB.ts)DB.ts=1;cloud.setItem("tdb",JSON.stringify(DB))}}catch(e){}})}
 /* Контент (новости, меню, вечера). Сейчас хранится на устройстве. С сервером этот блок заменяется запросами к API. */
 let NEWS=[{id:"n1",title:"Музыкальный вечер 19 ноября",text:"Живая музыка в кофейне. Места ограничены, запишитесь заранее в разделе «Вечера».",date:"2026-11-16",pin:1,art:"music"},{id:"n2",title:"Обеды с 12:00",text:"Полезная тарелка по будням с 12:00, пока не съедят.",date:"2026-11-10",pin:0,art:"plate"},{id:"n3",title:"Осенние напитки",text:"Загляните за сезонными напитками. Подробности скоро.",date:"2026-11-03",pin:0,art:"latte"}];
@@ -2500,8 +2500,10 @@ if(Array.isArray(c.news))NEWS=c.news;if(Array.isArray(c.events))EVENTS=c.events;
 OTHERS=r.others||{};const b={};Object.keys(r.mine||{}).forEach(k=>{const a=r.mine[k].filter(x=>ALL.includes(x));if(a.length)b[k]=a});DB.book=b;
 LS.s(CTK,CT());save();
 if(STAFF)["news","events","menu"].forEach(k=>{if(!c[k])pushCT(k)})} /* первый вход сотрудника: загружаем стартовые данные на сервер */
-async function syncContent(){if(!inTg)return;try{const r=await api("content");if(r&&r.content){applyContent(r);if(!S.sub||S.sub!=="seats")render()}}catch(e){}}
-async function refreshMe(){if(!inTg)return;try{const r=await api("me");if(r.me){applyMe(r.me);render()}}catch(e){}}
+/* Фоновые обновления не перерисовывают открытую форму: иначе несохранённый текст пропадает */
+const softRender=()=>{if(S.sub==="form")return;render()};
+async function syncContent(){if(!inTg)return;try{const r=await api("content");if(r&&r.content){applyContent(r);if(S.sub!=="seats")softRender()}}catch(e){}}
+async function refreshMe(){if(!inTg)return;try{const r=await api("me");if(r.me){applyMe(r.me);softRender()}}catch(e){}}
 async function addCode(raw){const c=String(raw||"").trim();
 if(!c)return["bad","Введите код с чека"];
 if(!inTg)return["bad","Кружки добавляются только внутри Telegram"];
