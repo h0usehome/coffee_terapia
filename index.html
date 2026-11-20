@@ -2432,8 +2432,12 @@ if(c&&(c.ts||0)>(DB.ts||0)){{const k={cups:DB.cups,visits:DB.visits,hist:DB.hist
 else if(DB.ts||DB.cups||DB.visits.length||Object.keys(DB.book).length){if(!DB.ts)DB.ts=1;cloud.setItem("tdb",JSON.stringify(DB))}}catch(e){}})}
 /* Контент (новости, меню, вечера). Сейчас хранится на устройстве. С сервером этот блок заменяется запросами к API. */
 let NEWS=[{id:"n1",title:"Музыкальный вечер 19 ноября",text:"Живая музыка в кофейне. Места ограничены, запишитесь заранее в разделе «Вечера».",date:"2026-11-16",pin:1,art:"music"},{id:"n2",title:"Обеды с 12:00",text:"Полезная тарелка по будням с 12:00, пока не съедят.",date:"2026-11-10",pin:0,art:"plate"},{id:"n3",title:"Осенние напитки",text:"Загляните за сезонными напитками. Подробности скоро.",date:"2026-11-03",pin:0,art:"latte"}];
-{const c=LS.g("tct2",null);if(c){MENU=c.menu;EVENTS=c.events;NEWS=c.news}}
-const saveCT=()=>LS.s("tct2",{menu:MENU,events:EVENTS,news:NEWS});
+const CTK=inTg?"tct3":"tct2"; /* в Telegram это кэш серверных данных, вне Telegram — локальные правки */
+{const c=LS.g(CTK,null);if(c){if(c.menu)MENU=c.menu;if(c.events)EVENTS=c.events;if(c.news)NEWS=c.news}}
+const CT=()=>({menu:MENU,events:EVENTS,news:NEWS});
+const CTD={news:()=>NEWS,events:()=>EVENTS,menu:()=>MENU};
+function pushCT(k){if(!inTg)return Promise.resolve();return api("setcontent",{key:k,data:CTD[k]()}).then(r=>{if(r&&r.error)toast(r.error)}).catch(()=>toast("Не удалось сохранить на сервере. Проверьте связь"))}
+const saveCT=k=>{LS.s(CTK,CT());if(k)pushCT(k)};
 const CFG=Object.assign({theme:"auto",anim:1},LS.g("tcfg",{}));
 const PAL={light:{bd:"#E5D6C6",dash:"#C9B3A0",mu:"#7A5F57",br:"#4A1E1B",on:"#F6EFE6",card:"#FFFAF4",ink:"#3A1613",ph:"#EBD9C5"},dark:{bd:"#3A2B26",dash:"#6A574E",mu:"#B7A398",br:"#E6BE94",on:"#2A1512",card:"#261B18",ink:"#F3E9DF",ph:"#33261F"}};
 let K=PAL.light,THEME="light";
@@ -2485,11 +2489,18 @@ const menuCard=x=>`<div class="pc"><div class="pic">${artSvg(x.art)}${x.img?`<im
 const pos=()=>DB.cups?((DB.cups-1)%CUPS_MAX)+1:0;
 function streak(){const w=new Set(DB.visits.map(widx));let c=widx(day()),n=0;if(!w.has(c))c--;while(w.has(c)){n++;c--}return n}
 const nextEv=()=>EVENTS.find(e=>e.date>=day())||EVENTS[0];
-const taken=e=>e.occ==="all"?ALL:e.occ;
+let OTHERS={};
+const taken=e=>e.occ==="all"?ALL:[...new Set([...(e.occ||[]),...(OTHERS[e.id]||[])])];
 const left=e=>ALL.length-taken(e).length-(DB.book[e.id]||[]).length;
 const api=(action,extra)=>fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({action:action,initData:tg.initData},extra||{}))}).then(r=>r.json());
 let STAFF=!!LS.g("tstaff",0),SCONF=true,BUSY=false;
 function applyMe(m){DB.cups=m.cups;DB.visits=m.visits;DB.hist=m.hist;STAFF=!!m.staff;SCONF=!!m.staffConfigured;LS.s("tstaff",STAFF?1:0);save()}
+function applyContent(r){if(!r)return;const c=r.content||{};
+if(Array.isArray(c.news))NEWS=c.news;if(Array.isArray(c.events))EVENTS=c.events;if(c.menu&&typeof c.menu==="object"&&!Array.isArray(c.menu))MENU=c.menu;
+OTHERS=r.others||{};const b={};Object.keys(r.mine||{}).forEach(k=>{const a=r.mine[k].filter(x=>ALL.includes(x));if(a.length)b[k]=a});DB.book=b;
+LS.s(CTK,CT());save();
+if(STAFF)["news","events","menu"].forEach(k=>{if(!c[k])pushCT(k)})} /* первый вход сотрудника: загружаем стартовые данные на сервер */
+async function syncContent(){if(!inTg)return;try{const r=await api("content");if(r&&r.content){applyContent(r);if(!S.sub||S.sub!=="seats")render()}}catch(e){}}
 async function refreshMe(){if(!inTg)return;try{const r=await api("me");if(r.me){applyMe(r.me);render()}}catch(e){}}
 async function addCode(raw){const c=String(raw||"").trim();
 if(!c)return["bad","Введите код с чека"];
@@ -2534,7 +2545,7 @@ return `<div style="border:1px solid var(--bd);border-radius:22px;overflow-x:aut
 const lg=(s,t)=>`<div class="row" style="gap:6px"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">${sg(12,12,s)}</svg><span class="m">${t}</span></div>`;
 function evCard(e){const d=dd(e.date),b=DB.book[e.id],l=left(e);
 const act=b?`<button class="bt o" data-act="ev" data-p="${e.id}">Изменить запись</button>`:l>0?`<button class="bt" data-act="ev" data-p="${e.id}">Записаться</button>`:DB.wait[e.id]?`<button class="bt o" disabled>Вы в листе ожидания</button>`:`<button class="bt o" data-act="wait" data-p="${e.id}">В лист ожидания</button>`;
-return `<div class="k col"><div class="row"><div class="dt"><b>${d.n}</b><span>${d.ms}</span></div><div><b>${esc(e.title)}</b><div class="m">${e.tag?esc(e.tag)+" · ":""}${d.w}, ${e.time} · ${b?"вы записаны, мест: "+b.length:l>0?"свободно мест: "+l:"мест нет"}</div></div></div>${act}</div>`}
+return `<div class="k col"><div class="row"><div class="dt"><b>${d.n}</b><span>${d.ms}</span></div><div><b>${esc(e.title)}</b><div class="m">${e.tag?esc(e.tag)+" · ":""}${d.w}, ${e.time} · ${b?"вы записаны, мест: "+b.length:l>0?"свободно мест: "+l:"мест нет"}</div></div></div>${e.desc?`<div style="font-size:14px;line-height:1.5;white-space:pre-line;color:var(--ink)">${esc(e.desc)}</div>`:""}${act}</div>`}
 
 const V={
 home:()=>{const c=pos(),nx=c<5?5:c<10?10:c<15?15:5,l=nx-c,u=inTg&&tg.initDataUnsafe&&tg.initDataUnsafe.user,st=streak(),ev=nextEv(),d=dd(ev.date),b=DB.book[ev.id],cw=widx(day());
@@ -2562,7 +2573,7 @@ ${S.msg?`<div class="msg ${S.msg[0]==="bad"?"bad":""}" role="status">${S.msg[1]}
 `,
 events:()=>`<div><h1 class="h">Вечера</h1><div class="m" style="margin-top:6px">Живая музыка в Терапии. Нужна запись, мест немного.</div></div>${EVENTS.map(evCard).join("")}`,
 seats:()=>{const e=EVENTS.find(x=>x.id===S.p),d=dd(e.date),n=S.sel.length;
-return `${hdr("Выбор мест")}<div class="dk" style="padding:12px 16px"><b>${esc(e.title)}${e.tag?" · "+esc(e.tag.toLowerCase()):""}</b><div class="m">${d.w}, ${d.n} ${d.m} · ${e.time}</div></div>${mapSvg(e)}
+return `${hdr("Выбор мест")}<div class="dk" style="padding:12px 16px"><b>${esc(e.title)}${e.tag?" · "+esc(e.tag.toLowerCase()):""}</b><div class="m">${d.w}, ${d.n} ${d.m} · ${e.time}</div>${e.desc?`<div style="font-size:13px;line-height:1.45;margin-top:8px;white-space:pre-line">${esc(e.desc)}</div>`:""}</div>${mapSvg(e)}
 <div class="row sb">${lg("f","Свободно")}${lg("o","Занято")}${lg("s","Ваш выбор")}</div>
 <div class="k row sb" style="padding:12px 16px"><div><b>${n?(isWhole(S.sel)?"Стол "+tableOf(S.sel[0])+": "+n+" "+pl(n,["место","места","мест"]):"Выбрано: "+n+" "+pl(n,["место","места","мест"])):"Выберите место или стол"}</b><div class="m">${isWhole(S.sel)?"Бронируется весь стол сразу":"До "+MAXS+" мест или стол целиком"}</div></div>${n?'<button class="ch" data-act="clear">Сбросить</button>':""}</div>
 <div class="sticky"><button class="bt" style="height:52px;font-size:16px" data-act="book" ${n?"":"disabled"}>${n?(isWhole(S.sel)?"Забронировать стол "+tableOf(S.sel[0]):"Забронировать "+n+" "+pl(n,["место","места","мест"])):"Забронировать"}</button></div>`},
@@ -2589,17 +2600,17 @@ const newsCard=(x,w)=>{const d=dd(x.date);return `<button class="k ${w?"nl":"nc"
 const newsBlock=()=>{const n=sortN().slice(0,5);return n.length?`<div class="sec"><div class="row sb"><h2 class="st">Новости</h2>${NEWS.length>1?'<button class="ch" data-sub="news">Все</button>':""}</div><div class="row hs" style="align-items:stretch">${n.map(x=>newsCard(x)).join("")}</div></div>`:""};
 const rowA=(t,sub,kind,i)=>`<div class="k row sb"><div style="min-width:0;flex:1"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t)}</b><div class="m">${sub}</div></div><button class="ch" data-act="aform" data-p="${kind}" data-i="${i}">Изменить</button><button class="ch" data-act="adel" data-p="${kind}" data-i="${i}">Удалить</button></div>`;
 const addBar=(k,l)=>`<div class="sticky"><button class="bt" data-act="aform" data-p="${k}" data-i="-1">${l}</button></div>`;
-const NOTE=`<div class="m" style="line-height:1.5">В этой версии изменения хранятся только на этом устройстве. Чтобы их видели все гости, подключается сервер.</div>`;
-const FORMS={news:{t:"Новость",b:"anews",f:[["title","Заголовок","text"],["text","Текст","area"],["img","Ссылка на фото (необязательно)","text"],["pin","Закрепить вверху","bool"]]},item:{t:"Позиция меню",b:"amenu",f:[["name","Название","text"],["desc","Описание","text"],["price","Цена (число)","text"],["rub","Цена в рублях (иначе в комплиментах)","bool"],["vol","Объём или вес, например 200 мл","text"],["img","Ссылка на фото (необязательно)","text"]]},event:{t:"Вечер",b:"aevents",f:[["title","Название","text"],["tag","Исполнитель или формат","text"],["date","Дата","date"],["time","Время","text"]]},cat:{t:"Новая категория",b:"amenu",f:[["name","Название","text"]]}};
+const NOTE=`<div class="m" style="line-height:1.5">${inTg?"Изменения сохраняются на сервере и сразу видны всем гостям.":"Вне Telegram изменения хранятся только на этом устройстве."}</div>`;
+const FORMS={news:{t:"Новость",b:"anews",f:[["title","Заголовок","text"],["text","Текст","area"],["img","Ссылка на фото (необязательно)","text"],["pin","Закрепить вверху","bool"]]},item:{t:"Позиция меню",b:"amenu",f:[["name","Название","text"],["desc","Описание","text"],["price","Цена (число)","text"],["rub","Цена в рублях (иначе в комплиментах)","bool"],["vol","Объём или вес, например 200 мл","text"],["img","Ссылка на фото (необязательно)","text"]]},event:{t:"Вечер",b:"aevents",f:[["title","Название","text"],["tag","Исполнитель или формат","text"],["date","Дата","date"],["time","Время","text"],["desc","Описание вечера (программа, что взять с собой)","area"]]},cat:{t:"Новая категория",b:"amenu",f:[["name","Название","text"]]}};
 const src=(k,i)=>i<0?{}:k==="news"?Object.assign({},NEWS[i]):k==="event"?Object.assign({},EVENTS[i]):k==="item"?(x=>({name:x.n,desc:x.d,price:String(x.p).replace(".",","),rub:x.u==="r"?1:0,vol:x.v||"",img:x.img||"",art:x.art||""}))(MENU[S.acat][i]):{};
 const rf=()=>{FORMS[S.form.kind].f.forEach(f=>{if(f[2]!=="bool"){const el=$("#f_"+f[0]);if(el)S.form.v[f[0]]=el.value}})};
 function fsave(){rf();const F=S.form,v=F.v,i=F.i,k=F.kind,need=k==="news"?v.title:(k==="item"||k==="cat")?v.name:(v.title&&v.date);
 if(!String(need||"").trim()){S.msg=["bad","Заполните обязательные поля"];return}
 if(k==="news"){const o={id:v.id||"n"+Date.now(),title:v.title.trim(),text:(v.text||"").trim(),pin:v.pin?1:0,date:v.date||day(),img:(v.img||"").trim(),art:v.art||""};i>=0?NEWS[i]=o:NEWS.unshift(o)}
 else if(k==="item"){const a={n:v.name.trim(),d:(v.desc||"").trim(),p:parseFloat(String(v.price||"0").replace(",","."))||0,u:v.rub?"r":"k",v:(v.vol||"").trim(),img:(v.img||"").trim(),art:v.art||""};i>=0?MENU[S.acat][i]=a:MENU[S.acat].push(a)}
-else if(k==="event"){const o={id:v.id||"e"+Date.now(),title:v.title.trim(),tag:(v.tag||"").trim(),date:v.date,time:(v.time||"19:00").trim(),occ:v.occ||[]};i>=0?EVENTS[i]=o:EVENTS.push(o);EVENTS.sort((a,b)=>a.date.localeCompare(b.date))}
+else if(k==="event"){const o={id:v.id||"e"+Date.now(),title:v.title.trim(),tag:(v.tag||"").trim(),date:v.date,time:(v.time||"19:00").trim(),desc:(v.desc||"").trim(),occ:v.occ||[]};i>=0?EVENTS[i]=o:EVENTS.push(o);EVENTS.sort((a,b)=>a.date.localeCompare(b.date))}
 else{const n=v.name.trim();if(!MENU[n])MENU[n]=[];S.acat=n}
-saveCT();S.sub=F.b;S.msg=null}
+saveCT(k==="news"?"news":k==="event"?"events":"menu");S.sub=F.b;S.msg=null}
 const photoBlock=v=>`<div class="col" style="gap:10px">${v.img?`<div class="k" style="padding:0;overflow:hidden"><div class="ncv"><img src="${esc(v.img)}" alt="" onerror="this.remove()"></div></div>`:""}<label class="bt o" style="display:flex;align-items:center;justify-content:center;cursor:pointer">${v.img?"Заменить фото":"Выбрать фото с телефона"}<input type="file" id="f_file" accept="image/*" hidden></label>${v.img?'<button class="ch" data-act="rmimg" style="align-self:flex-start">Убрать фото</button>':""}</div>`;
 const tile=(s,t,d)=>`<button class="k" style="text-align:left" data-sub="${s}"><b>${t}</b><div class="m" style="margin-top:4px">${d}</div></button>`;
 Object.assign(V,{
@@ -2651,6 +2662,12 @@ tb.innerHTML=TABS.map(t=>t[0]==="home"?`<button class="hb ${S.tab==="home"?"on":
 if(inTg){S.sub?tg.BackButton.show():tg.BackButton.hide()}
 if(S.sub==="barista"&&!btm){btm=setInterval(baristaTick,1000);baristaTick()}}
 function back(){if(!S.sub){S.tab="home";return}S.sel=[];S.msg=null;S.sub=S.sub==="form"?S.form.b:({anews:"admin",amenu:"admin",aevents:"admin"}[S.sub]||null)}
+async function bookNow(){if(BUSY)return;const id=S.p,sel=S.sel.slice();
+if(!inTg){DB.book[id]=sel;save();S.sub="done";render();return}
+BUSY=true;try{const r=await api("book",{event_id:id,seats:sel});if(r.content)applyContent(r);
+if(r.error){toast(r.error);S.sel=sel.filter(x=>!taken(EVENTS.find(e=>e.id===id)||{}).includes(x))}else S.sub="done"}catch(e){toast("Нет связи с сервером. Попробуйте ещё раз")}BUSY=false;render()}
+async function cancelEv(id,after){if(BUSY)return;if(!inTg){delete DB.book[id];save();after();render();return}
+BUSY=true;try{const r=await api("cancel",{event_id:id});if(r.content){applyContent(r);after()}else toast(r.error||"Не удалось отменить")}catch(e){toast("Нет связи с сервером")}BUSY=false;render()}
 function pickTable(n){const ev=EVENTS.find(x=>x.id===S.p);if(!ev)return;const o=new Set(taken(ev)),ss=tableSeats(n);if(ss.some(x=>o.has(x))){toast("За этим столом уже есть занятые места. Выберите свободные места по одному");return}S.sel=S.sel.length&&tableOf(S.sel[0])===n?[]:ss}
 document.addEventListener("click",e=>{
 const sx=e.target.closest("[data-seat]");
@@ -2662,9 +2679,9 @@ else if(d.sub){S.sub=d.sub;S.msg=null}
 else if(a==="back")back();
 else if(a==="ev"){S.p=d.p;S.sel=(DB.book[d.p]||[]).slice();S.sub="seats"}
 else if(a==="clear")S.sel=[];
-else if(a==="book"){DB.book[S.p]=S.sel.slice();save();S.sub="done"}
-else if(a==="cancel"){delete DB.book[S.p];save();S.sub=null}
-else if(a==="cancelp"){const m="Отменить запись на этот вечер?",id=d.p,ok=()=>{delete DB.book[id];save();render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
+else if(a==="book"){bookNow();return}
+else if(a==="cancel"){cancelEv(S.p,()=>{S.sub=null});return}
+else if(a==="cancelp"){const m="Отменить запись на этот вечер?",id=d.p,ok=()=>cancelEv(id,()=>{});(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
 else if(a==="wait"){DB.wait[d.p]=1;save()}
 else if(a==="cat")S.cat=d.p;
 else if(a==="rtt")S.rtt=d.p;
@@ -2679,15 +2696,17 @@ else if(a==="aform"){const i=+d.i;S.form={kind:d.p,i:i,v:src(d.p,i),b:FORMS[d.p]
 else if(a==="rmimg"){rf();S.form.v.img=""}
 else if(a==="ftog"){rf();S.form.v[d.p]=S.form.v[d.p]?0:1}
 else if(a==="fsave")fsave();
-else if(a==="adel"){const i=+d.i,k=d.p,m="Удалить? Это действие нельзя отменить.",ok=()=>{if(k==="news")NEWS.splice(i,1);else if(k==="event")EVENTS.splice(i,1);else MENU[S.acat].splice(i,1);saveCT();render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
+else if(a==="adel"){const i=+d.i,k=d.p,m="Удалить? Это действие нельзя отменить.",ok=()=>{if(k==="news")NEWS.splice(i,1);else if(k==="event")EVENTS.splice(i,1);else MENU[S.acat].splice(i,1);saveCT(k==="news"?"news":k==="event"?"events":"menu");render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
 else if(a==="theme"){CFG.theme=d.p;LS.s("tcfg",CFG);applyTheme()}
 else if(a==="ptog"){CFG[d.p]=CFG[d.p]?0:1;LS.s("tcfg",CFG);applyTheme()}
-else if(a==="wipe"){const m="Отменить все ваши записи на вечера?",ok=()=>{DB.book={};DB.wait={};save();render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
+else if(a==="wipe"){const m="Отменить все ваши записи на вечера?",ok=async()=>{if(inTg){try{const r=await api("cancelall");if(r.content)applyContent(r);else if(r.error){toast(r.error);return}}catch(e){toast("Нет связи с сервером");return}}DB.book={};DB.wait={};save();render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
 else if(a==="addcode"){submitCode($("#code").value);return}
 else if(a==="newqr"){bLast=0;BC.code=null;BC.err="";newCode()}
 else if(a==="scan"){if(inTg&&tg.showScanQrPopup){tg.showScanQrPopup({text:"Наведите на QR баристы"},txt=>{const m=String(txt).toUpperCase().match(/TR-[A-Z0-9]{6}/);submitCode(m?m[0]:String(txt));return true})}else{S.msg=["bad","Сканер доступен только внутри Telegram. Введите код вручную"]}}
 render()});
-document.addEventListener("change",e=>{const f=e.target;if(!f||f.id!=="f_file"||!f.files||!f.files[0])return;const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,900/im.width),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);rf();S.form.v.img=c.toDataURL("image/jpeg",.75);render()};im.src=rd.result};rd.readAsDataURL(f.files[0])});
+document.addEventListener("change",e=>{const f=e.target;if(!f||f.id!=="f_file"||!f.files||!f.files[0])return;const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,900/im.width),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);rf();const du=c.toDataURL("image/jpeg",.75);
+if(!inTg){S.form.v.img=du;render();return}
+toast("Загружаем фото…");api("upload",{image:du}).then(r=>{if(r.url){S.form.v.img=r.url;render()}else toast(r.error||"Не удалось загрузить фото")}).catch(()=>toast("Нет связи с сервером"))};im.src=rd.result};rd.readAsDataURL(f.files[0])});
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset&&e.target.dataset.seat){e.preventDefault();e.target.dispatchEvent(new MouseEvent("click",{bubbles:true}))}});
 /* Запрет масштабирования */
 ["gesturestart","gesturechange","gestureend"].forEach(n=>document.addEventListener(n,e=>e.preventDefault()));
@@ -2695,7 +2714,7 @@ document.addEventListener("touchmove",e=>{if(e.touches.length>1)e.preventDefault
 document.addEventListener("wheel",e=>{if(e.ctrlKey)e.preventDefault()},{passive:false});
 try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{if(CFG.theme==="auto"){applyTheme();render()}})}catch(e){}
 if(inTg)tg.BackButton.onClick(()=>{back();render()});
-applyTheme();render();syncCloud();refreshMe();document.addEventListener("visibilitychange",()=>{if(!document.hidden)refreshMe()});
+applyTheme();render();syncCloud();refreshMe().then(syncContent);document.addEventListener("visibilitychange",()=>{if(!document.hidden)refreshMe().then(syncContent)});
 </script>
 </body>
 </html>
