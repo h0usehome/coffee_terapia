@@ -65,7 +65,7 @@ textarea.fl{resize:vertical;line-height:1.5}
 .pc{background:var(--card);border:1px solid var(--bd);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
 .pic{position:relative;aspect-ratio:1/1;background:var(--ph)}.pic svg,.pic img{position:absolute;inset:0;width:100%;height:100%}.pic img{object-fit:cover}
 .pb{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
-.nt2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em;line-height:1.3;font-size:12px;color:var(--mu)}
+.nt2{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em;line-height:1.3;font-size:12px;color:var(--mu)}
 .vl{position:absolute;top:10px;right:10px;background:var(--card);font-size:11px;font-weight:600;color:var(--mu);border:1px solid var(--bd2);border-radius:999px;padding:2px 8px;white-space:nowrap}
 .nc{padding:0;overflow:hidden;min-height:0;align-items:stretch}.nl{padding:0;overflow:hidden;text-align:left;width:100%;display:flex;flex-direction:column;align-items:stretch}
 .ncv{position:relative;aspect-ratio:16/9;background:var(--ph);overflow:hidden}.ncv svg,.ncv img{position:absolute;inset:0;width:100%;height:100%}.ncv img{object-fit:cover}
@@ -2392,21 +2392,113 @@ const CUPS_MAX=15, REW={5:"конфета",10:"круассан",15:"кофе в
 /* Сервер (Supabase Edge Function): проверяет коды и считает кружки. Токен бота хранится только на сервере. */
 const API="https://ktacbvcwsyajpeacdmwt.supabase.co/functions/v1/terapia-api";
 let MENU={"Кофе":[
-{n:"Эспрессо",d:"Короткий и крепкий",v:"30 мл",p:4,u:"k",art:"espresso"},
-{n:"Американо",d:"Эспрессо с горячей водой",v:"200 мл",p:5,u:"k",art:"americano"},
-{n:"Капучино",d:"Эспрессо и воздушная молочная пена",v:"200 мл",p:7,u:"k",art:"cappuccino"},
-{n:"Латте",d:"Эспрессо и много нежного молока",v:"300 мл",p:8,u:"k",art:"latte"},
-{n:"Флэт уайт",d:"Двойной эспрессо с молоком",v:"160 мл",p:8,u:"k",art:"flat"},
-{n:"Раф",d:"Сливочный, с ванильным сахаром",v:"300 мл",p:9,u:"k",art:"raf"}],
+{"n":"Фильтр-кофе","d":"","p":7,"u":"r","v":"220 | 320 мл","pv":"7 | 8","art":"americano"},
+{"n":"Американо","d":"","p":6,"u":"r","v":"220 | 320 мл","pv":"6 | 7","art":"americano"},
+{"n":"Эспрессо","d":"","p":6,"u":"r","v":"30 | 60 мл","pv":"6 | 7","art":"espresso"},
+{"n":"Флэт уайт","d":"","p":8,"u":"r","v":"220 мл","art":"flat"},
+{"n":"Латте","d":"","p":7,"u":"r","v":"220 | 320 | 400 мл","pv":"7 | 8 | 9","art":"latte"},
+{"n":"Капучино","d":"","p":7,"u":"r","v":"220 | 320 | 400 мл","pv":"7 | 8 | 9","art":"cappuccino"},
+{"n":"Раф","d":"","p":8.5,"u":"r","v":"320 | 400 мл","pv":"8,5 | 10","art":"raf"},
+{"n":"Халвичный раф","d":"","p":11,"u":"r","v":"320 мл","art":"raf"},
+{"n":"Бамбл апельсин | вишня","d":"","p":10,"u":"r","v":"320 мл","art":"lemonade"}],
+"К кофе":[
+{"n":"Альтернативное молоко","d":"Кокосовое, фундучное, миндальное, банановое, овсяное, безлактозное","p":3,"u":"r","pv":"+3","art":"latte"},
+{"n":"Декаф | Арабика","d":"","p":1,"u":"r","pv":"+1","art":"espresso"},
+{"n":"Сироп","d":"Ваниль-бурбон, шоколадный трюфель, брауни, коровка, солёная карамель, фисташка, фундук, кокос, мята-эвкалипт, пряности, малина, имбирь, вишня","p":1.5,"u":"r","v":"15 мл","pv":"+1,5"}],
 "Не кофе":[
-{n:"Матча-латте",d:"Зелёный чай матча с молоком",v:"300 мл",p:9,u:"k",art:"matcha"},
-{n:"Какао",d:"Густое, с зефирками",v:"250 мл",p:7,u:"k",art:"cocoa"},
-{n:"Чай с лимоном",d:"Чёрный чай, свежий лимон",v:"400 мл",p:5,u:"k",art:"tea"},
-{n:"Лимонад дня",d:"Освежающий, с мятой",v:"400 мл",p:7,u:"k",art:"lemonade"}],
+{"n":"Матча-латте","d":"","p":8,"u":"r","v":"320 мл","art":"matcha"},
+{"n":"Какао","d":"","p":7,"u":"r","v":"220 | 320 мл","pv":"7 | 8","art":"cocoa"},
+{"n":"Глинтвейн","d":"","p":9,"u":"r","v":"320 мл","pv":"9 | 12","art":"cocoa"}],
+"Чай":[
+{"n":"Малиновый с мятой","d":"Натуральный чай","p":10.5,"u":"r","v":"400 мл","art":"tea"},
+{"n":"Имбирный с цитрусами","d":"Натуральный чай","p":10.5,"u":"r","v":"400 мл","art":"tea"},
+{"n":"Смородиновый с апельсином","d":"Натуральный чай","p":10.5,"u":"r","v":"400 мл","art":"tea"},
+{"n":"Облепиховый с розмарином","d":"Натуральный чай. Можно добавить мёд по желанию","p":10.5,"u":"r","v":"400 мл","art":"tea"},
+{"n":"Чёрный или зелёный чай","d":"С чабрецом, с мятой или с ромашкой","p":9,"u":"r","v":"500 мл","art":"tea"},
+{"n":"Молочный улун","d":"Листовой чай","p":9,"u":"r","v":"500 мл","art":"tea"},
+{"n":"Таёжный","d":"Листовой чай","p":9,"u":"r","v":"500 мл","art":"tea"},
+{"n":"Манго-цитрус","d":"Листовой чай","p":9,"u":"r","v":"500 мл","art":"tea"},
+{"n":"Фреш-мятный ананас","d":"Листовой чай","p":9,"u":"r","v":"500 мл","art":"tea"},
+{"n":"Оранжевая ежевика","d":"Листовой чай","p":9,"u":"r","v":"500 мл","art":"tea"},
+{"n":"Швейцарский","d":"Листовой чай","p":9,"u":"r","v":"500 мл","art":"tea"},
+{"n":"Гречишный","d":"Листовой чай","p":7.5,"u":"r","v":"500 мл","art":"tea"},
+{"n":"Чай с собой","d":"Любой чай в стаканчик","p":0,"u":"r","v":"320 мл","art":"tea"}],
+"Сезонные напитки":[
+{"n":"Апельсиновый фреш","d":"","p":12,"u":"r","art":"lemonade"},
+{"n":"Лимонад Клюква-вишня","d":"Кислый, бодрящий, с ягодной насыщенностью","p":10,"u":"r","art":"lemonade"},
+{"n":"Лимонад Пряный апельсин","d":"Немного терпкости и нежности с фруктовой пенкой","p":10,"u":"r","art":"lemonade"},
+{"n":"Бамбл","d":"На апельсиновом или вишнёвом нектаре (сладкий и фруктовый) или фреше (свежий и кисловатый)","p":10,"u":"r","pv":"10 | 15","art":"lemonade"},
+{"n":"Эспрессо-тоник","d":"Резкий контраст горького тоника и крепкого кофе или матчи","p":10,"u":"r","art":"espresso"},
+{"n":"Айс-латте","d":"Охлаждённый кофе с молоком, мягкий и сливочный","p":9,"u":"r","art":"latte"},
+{"n":"Сырный айс-латте","d":"Охлаждённый кофе с молоком и сырной пенкой","p":10,"u":"r","art":"latte"},
+{"n":"Матча-латте Мятный персик","d":"Ароматная матча, освежающая мята и сочный персик","p":10,"u":"r","art":"matcha"},
+{"n":"Матча-тоник | персик","d":"Лёгкая горечь матчи и сочный персик","p":10,"u":"r","art":"matcha"}],
+"Коктейли и вино":[
+{"n":"Апероль спритц","d":"","p":21,"u":"r","v":"210 мл","art":"lemonade"},
+{"n":"Джин-тоник","d":"Базилик, огурец","p":21,"u":"r","v":"160 мл","art":"lemonade"},
+{"n":"Беллини","d":"","p":21,"u":"r","v":"125 мл","art":"lemonade"},
+{"n":"Креми брауни","d":"","p":21,"u":"r","v":"110 мл","art":"cocoa"},
+{"n":"Просекко","d":"","p":17,"u":"r","v":"125 мл","art":"lemonade"},
+{"n":"Вино красное","d":"Gold Country California Zinfandel (США)","p":17,"u":"r","v":"125 мл","art":"lemonade"}],
+"Бокал к завтраку":[
+{"n":"Мимоза","d":"Бокал для настроения к завтраку (до 12:00)","p":9,"u":"r","v":"125 мл","art":"lemonade"},
+{"n":"Просекко","d":"Бокал для настроения к завтраку (до 12:00)","p":9,"u":"r","v":"125 мл","art":"lemonade"}],
+"Завтраки":[
+{"n":"Домашний завтрак","d":"Запечённый картофель, колбаска, бекон, корнишоны, зелёный соус, яичница глазунья","p":27,"u":"r","v":"310 г","art":"plate"},
+{"n":"Завтрак с креветками и вафлями","d":"Творожные вафли, яичница глазунья, креветки, томаты, салат микс","p":28,"u":"r","v":"215 г","art":"plate"},
+{"n":"Гранола медово-ореховая","d":"С йогуртом, вишнёвым компотом и фруктами","p":12,"u":"r","v":"220 г","art":"plate"},
+{"n":"Кус-кус морской","d":"С форелью, авокадо, салатом чука и ореховым соусом","p":24,"u":"r","v":"250 г","art":"plate"},
+{"n":"Каша овсяная","d":"С блю-чизом, грушей и карамелью","p":16,"u":"r","v":"220 г","art":"plate"},
+{"n":"Вафли творожные","d":"С кремом и апельсиновым джемом","p":19,"u":"r","v":"190 г","art":"plate"}],
+"Собери свой завтрак":[
+{"n":"Основа","d":"Скрэмбл + тосты + крем-чиз + салат","p":11.5,"u":"r","v":"205 г","art":"plate"},
+{"n":"Форель","d":"Добавка","p":8,"u":"r","v":"40 г","pv":"+8","art":"plate"},
+{"n":"Креветки","d":"Добавка","p":7,"u":"r","v":"40 г","pv":"+7","art":"plate"},
+{"n":"Авокадо","d":"Добавка","p":6.5,"u":"r","v":"30 г","pv":"+6,5","art":"plate"},
+{"n":"Бекон","d":"Добавка","p":5,"u":"r","v":"35 г","pv":"+5","art":"plate"},
+{"n":"Томат свежий","d":"Добавка","p":3.5,"u":"r","v":"35 г","pv":"+3,5","art":"plate"},
+{"n":"Огурец свежий","d":"Добавка","p":2.5,"u":"r","v":"45 г","pv":"+2,5","art":"plate"},
+{"n":"Маасдам","d":"Добавка","p":3,"u":"r","v":"25 г","pv":"+3","art":"plate"},
+{"n":"Ветчина","d":"Добавка","p":3.5,"u":"r","v":"40 г","pv":"+3,5","art":"plate"},
+{"n":"Колбаски гриль","d":"Добавка","p":3.5,"u":"r","v":"55 г","pv":"+3,5","art":"plate"},
+{"n":"Утиный паштет","d":"Добавка","p":2.5,"u":"r","v":"35 г","pv":"+2,5","art":"plate"},
+{"n":"Оливки","d":"Добавка","p":3.5,"u":"r","v":"15 г","pv":"+3,5","art":"plate"},
+{"n":"Корнишон маринованный","d":"Добавка","p":2.5,"u":"r","v":"20 г","pv":"+2,5","art":"plate"},
+{"n":"Скрэмбл дополнительный","d":"Добавка","p":1.5,"u":"r","v":"55 г","pv":"+1,5","art":"plate"}],
+"Круассаны":[
+{"n":"С форелью и скрэмблом","d":"","p":16,"u":"r","art":"plate"},
+{"n":"С утиным паштетом","d":"Брусничный соус и скрэмбл","p":12,"u":"r","art":"plate"},
+{"n":"С форелью, крем-чизом и зеленью","d":"","p":14,"u":"r","art":"plate"},
+{"n":"С ветчиной","d":"Горчичный соус","p":11,"u":"r","art":"plate"},
+{"n":"С нутеллой, бананом и ягодами","d":"","p":13,"u":"r","art":"plate"},
+{"n":"С нутеллой","d":"","p":9.5,"u":"r","art":"plate"},
+{"n":"С крем-чизом и апельсиновым джемом","d":"","p":8,"u":"r","art":"plate"},
+{"n":"Классический","d":"","p":5,"u":"r","art":"plate"}],
+"Сырники и блинчики":[
+{"n":"Сырники со сметаной","d":"Вишнёвый компот","p":15,"u":"r","v":"255 г","art":"plate"},
+{"n":"Сырники со сливочным кремом","d":"С фруктами","p":16.5,"u":"r","v":"255 г","art":"plate"},
+{"n":"Сырники солёные","d":"С сыром и зелёным соусом","p":17,"u":"r","v":"205 г","art":"plate"},
+{"n":"Блинчики с форелью","d":"С творожным сыром","p":27,"u":"r","v":"195 г","art":"plate"},
+{"n":"Блинчики с ветчиной и сыром","d":"В грибном соусе","p":19,"u":"r","v":"195 г","art":"plate"},
+{"n":"Блинчики с вишнёвым соусом","d":"Со сметаной","p":17,"u":"r","v":"190 г","art":"plate"}],
+"Салаты и суп":[
+{"n":"Салат с ростбифом","d":"Салат микс, картофель, ростбиф, черри, каперсы, фета, трюфельный соус","p":22,"u":"r","v":"240 г","art":"plate"},
+{"n":"Салат с креветками и апельсином","d":"Салат микс, креветки, черри, огурец, авокадо, апельсин, цитрусовый соус","p":22,"u":"r","v":"250 г","art":"plate"},
+{"n":"Суп дня","d":"Спросите у баристы","p":12,"u":"r","v":"300 г","art":"soup"}],
 "Обеды":[
-{n:"Полезная тарелка",d:"С 12:00 пн–пт, пока не съедят",v:"",p:19,u:"r",art:"plate"},
-{n:"Суп дня",d:"Добавка к обеду",v:"270 г",p:6,u:"r",art:"soup"},
-{n:"Хлеб",d:"Добавка к обеду",v:"30 г",p:1.5,u:"r",art:"bread"}]};
+{"n":"Полезная тарелка","d":"С 16 по 20 ноября, пн–пт. Подаём с 12:00 и пока не съедят","p":19,"u":"r","art":"plate"},
+{"n":"Понедельник","d":"Мясной кебаб с булгуром · Печёный перец с томатом и маринованным красным луком","p":0,"u":"r","art":"plate"},
+{"n":"Вторник","d":"Куриное бедро в азиатском стиле с рисом · Хрустящий азиатский салат с кунжутом","p":0,"u":"r","art":"plate"},
+{"n":"Среда","d":"Медальоны из говядины с картофельным пюре и демигласом · Капустный салат с яблоком","p":0,"u":"r","art":"plate"},
+{"n":"Четверг","d":"Куриное филе на гриле с печёными сезонными овощами и фетой","p":0,"u":"r","art":"plate"},
+{"n":"Пятница","d":"Красная мясная лазанья с моцареллой · Зелёный салат с томатом и маринованным луком","p":0,"u":"r","art":"plate"},
+{"n":"Суп дня","d":"Добавка к обеду","p":6,"u":"r","v":"270 г","art":"soup"},
+{"n":"Хлеб","d":"Добавка к обеду","p":1.5,"u":"r","v":"30 г","art":"bread"}],
+"Заморозка домой":[
+{"n":"Сырники с цедрой лимона и корицей","d":"Замороженные полуфабрикаты","p":14,"u":"r","art":"plate"},
+{"n":"Сырники с вялеными томатами и зеленью","d":"Замороженные полуфабрикаты","p":18,"u":"r","art":"plate"},
+{"n":"Сырники классические","d":"Замороженные полуфабрикаты","p":14,"u":"r","v":"480 г","art":"plate"},
+{"n":"Блинчики с ветчиной и сыром","d":"Замороженные полуфабрикаты","p":13,"u":"r","v":"480 г","art":"plate"}]};
 /* Карта зала: координаты из дизайн-файла (столы, места, сцена, бар) */
 const HALL={"vb": [15, 19, 541, 269], "rects": [[244, 52, 101, 26, "Сцена", "stage"], [119, 189, 98, 73, "Бар", "bar"]], "tables": [["2", 72, 83, 18], ["3", 180, 83, 18], ["10", 400, 66, 18], ["11", 492, 66, 18], ["12", 454, 119, 18], ["4", 180, 167, 18], ["5", 270, 167, 18], ["6", 270, 208, 18], ["7", 270, 250, 18], ["1", 78, 220, 22], ["9", 370, 182, 18], ["8", 370, 241, 18]], "walls": [[29, 33, 542, 33], [29, 33, 29, 140], [29, 180, 29, 274], [29, 274, 416, 274], [225, 142, 225, 274], [416, 142, 416, 274], [416, 142, 542, 142], [542, 33, 542, 142]], "labels": [[56, 160, "ВХОД"]], "seats": [["2A", 61, 53], ["2B", 85, 53], ["2C", 72, 113], ["3A", 180, 53], ["3B", 210, 83], ["3C", 180, 113], ["3D", 150, 83], ["10A", 370, 66], ["10B", 430, 66], ["11A", 462, 66], ["11B", 522, 66], ["12A", 424, 119], ["12B", 484, 119], ["4A", 150, 167], ["4B", 210, 167], ["5A", 240, 167], ["5B", 300, 167], ["6A", 240, 208], ["6B", 300, 208], ["7A", 240, 250], ["7B", 300, 250], ["1A", 48, 195], ["1B", 102, 193], ["1C", 99, 252], ["1D", 67, 255], ["1E", 43, 225], ["9A", 400, 170], ["9B", 400, 196], ["9C", 340, 182], ["8A", 400, 229], ["8B", 400, 255], ["8C", 340, 241]]};
 const ALL=HALL.seats.map(x=>x[0]),MAXS=2;
@@ -2482,7 +2574,7 @@ ART.cup=()=>cupTop("#4B2A18","");
 let tt;function toast(m){try{let el=$("#toast");if(!el){el=document.createElement("div");el.id="toast";el.setAttribute("role","status");document.body.appendChild(el)}el.textContent=m;el.style.bottom="calc("+(["route","code","done","newsitem","news"].includes(S.sub)?28:100)+"px + var(--sab))";el.className="toast show";clearTimeout(tt);tt=setTimeout(()=>{el.className="toast"},2400)}catch(e){}}
 ART.music=()=>`<circle cx="60" cy="60" r="50" fill="${SC}" stroke="${LN}" stroke-width="2"/><path d="M48 78V44l32-8v34" fill="none" stroke="#4A1E1B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="42" cy="80" r="8" fill="#4A1E1B"/><circle cx="74" cy="72" r="8" fill="#4A1E1B"/>`;
 const artSvg=k=>`<svg viewBox="0 0 120 120" aria-hidden="true">${(ART[k]||ART.cup)()}</svg>`;
-const fmtP=x=>{const n=Number(x.p)||0,t=String(n).replace(".",",");return x.u==="r"?t+" руб":t+" "+pl(Math.floor(n),["комплимент","комплимента","комплиментов"])};
+const fmtP=x=>{if(x.pv)return x.pv+(x.u==="r"?" руб":"");const n=Number(x.p)||0;if(!n)return"";const t=String(n).replace(".",",");return x.u==="r"?t+" руб":t+" "+pl(Math.floor(n),["комплимент","комплимента","комплиментов"])};
 const menuCard=x=>`<div class="pc"><div class="pic">${artSvg(x.art)}${x.img?`<img src="${esc(x.img)}" alt="" loading="lazy" onerror="this.remove()">`:""}${x.v?`<span class="vl">${esc(x.v)}</span>`:""}</div><div class="pb"><b style="font-size:15px;line-height:1.25">${esc(x.n)}</b><div class="nt2">${esc(x.d)}</div><b style="margin-top:auto;padding-top:8px;color:var(--ac);font-size:14px">${esc(fmtP(x))}</b></div></div>`;
 
 /* ===== Данные ===== */
@@ -2536,14 +2628,14 @@ if(GI[p]===undefined)GI[p]=Math.floor(Math.random()*1000);
 return{t:hi+(name?", "+name:"")+"!",s:list[GI[p]%list.length][0]}}
 const cell=(n,c)=>n===5?`<div class="cell ${c>=5?"g":"go"}">${ic(CANDY)}</div>`:n===10?`<div class="cell ${c>=10?"g":"go"}">${ic(CROI)}</div>`:n===15?`<div class="cell ${c>=15?"g":"go"}">${ic(CUP)}</div>`:n<=c?`<div class="cell f">${ic(CUP,20)}</div>`:`<div class="cell e"></div>`;
 const sg=(x,y,s)=>s==="o"?`<circle cx="${x}" cy="${y}" r="12" fill="${K.bd}" stroke="${K.dash}" stroke-width="1.5"/><path d="M${x-4} ${y-4}l8 8m0-8l-8 8" stroke="${K.mu}" stroke-width="1.8" stroke-linecap="round"/>`:s==="s"?`<circle cx="${x}" cy="${y}" r="12" fill="${K.br}"/><path d="M${x-5} ${y}l3.5 3.5 6.5-7" stroke="${K.on}" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:`<circle cx="${x}" cy="${y}" r="12" fill="${K.card}" stroke="${K.dash}" stroke-width="1.5"/>`;
-function mapSvg(e){const o=new Set(taken(e)),vb=HALL.vb;let g=`<rect x="${vb[0]}" y="${vb[1]}" width="${vb[2]}" height="${vb[3]}" fill="${K.card}"/>`;
+function mapSvg(e,adm){const o=new Set(adm?(e.occ==="all"?ALL:e.occ||[]):taken(e)),vb=HALL.vb;let g=`<rect x="${vb[0]}" y="${vb[1]}" width="${vb[2]}" height="${vb[3]}" fill="${K.card}"/>`;
 HALL.walls.forEach(w=>{g+=`<path d="M${w[0]} ${w[1]}L${w[2]} ${w[3]}" stroke="${K.br}" stroke-width="5" stroke-linecap="square" fill="none"/>`});
 HALL.labels.forEach(l=>{g+=`<text x="${l[0]}" y="${l[1]+4}" text-anchor="middle" font-size="11" font-weight="700" fill="${K.mu}">${esc(l[2])}</text>`});
 HALL.rects.forEach(r=>{g+=`<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" rx="10" fill="${r[5]==="stage"?K.br:K.mu}"/><text x="${r[0]+r[2]/2}" y="${r[1]+r[3]/2+4}" text-anchor="middle" font-size="11" font-weight="700" fill="${K.on}">${esc(r[4])}</text>`});
-HALL.tables.forEach(t=>{const sel=isWhole(S.sel)&&tableOf(S.sel[0])===t[0];g+=`<g data-table="${esc(t[0])}" ><circle cx="${t[1]}" cy="${t[2]}" r="${sel?t[3]+3:t[3]}" fill="${sel?K.br:K.bd}"/><text x="${t[1]}" y="${t[2]+5}" text-anchor="middle" font-size="13" font-weight="700" fill="${sel?K.on:K.ink}">${esc(t[0])}</text></g>`});
-HALL.seats.forEach(q=>{const id=q[0],st=S.sel.includes(id)?"s":o.has(id)?"o":"f";
-g+=`<g data-seat="${id}" data-st="${st}" role="button" tabindex="0" aria-label="Место ${id}, ${st==="s"?"выбрано":st==="o"?"занято":"свободно"}"><circle cx="${q[1]}" cy="${q[2]}" r="13" fill="transparent"/>${sg(q[1],q[2],st)}</g>`});
-return `<div style="border:1px solid var(--bd);border-radius:22px;overflow-x:auto;background:var(--card);-webkit-overflow-scrolling:touch"><svg viewBox="${vb.join(" ")}" width="${Math.round(vb[2]*1.15)}" height="${Math.round(vb[3]*1.15)}" style="display:block;max-width:none">${g}</svg></div><div class="m" style="text-align:center">Нажмите на место или на стол целиком. Карту можно прокрутить вбок</div>`}
+HALL.tables.forEach(t=>{const sel=!adm&&isWhole(S.sel)&&tableOf(S.sel[0])===t[0];g+=`<g ${adm?"":`data-table="${esc(t[0])}"`} ><circle cx="${t[1]}" cy="${t[2]}" r="${sel?t[3]+3:t[3]}" fill="${sel?K.br:K.bd}"/><text x="${t[1]}" y="${t[2]+5}" text-anchor="middle" font-size="13" font-weight="700" fill="${sel?K.on:K.ink}">${esc(t[0])}</text></g>`});
+HALL.seats.forEach(q=>{const id=q[0],st=adm?(adm.has(id)?"s":o.has(id)?"o":"f"):S.sel.includes(id)?"s":o.has(id)?"o":"f";
+g+=`<g ${adm?"":`data-seat="${id}"`} data-st="${st}" ${adm?"":`role="button" tabindex="0"`} aria-label="Место ${id}, ${st==="s"?"выбрано":st==="o"?"занято":"свободно"}"><circle cx="${q[1]}" cy="${q[2]}" r="13" fill="transparent"/>${sg(q[1],q[2],st)}</g>`});
+return `<div style="border:1px solid var(--bd);border-radius:22px;overflow-x:auto;background:var(--card);-webkit-overflow-scrolling:touch"><svg viewBox="${vb.join(" ")}" width="${Math.round(vb[2]*1.15)}" height="${Math.round(vb[3]*1.15)}" style="display:block;max-width:none">${g}</svg></div><div class="m" style="text-align:center">${adm?"Карту можно прокрутить вбок":"Нажмите на место или на стол целиком. Карту можно прокрутить вбок"}</div>`}
 const lg=(s,t)=>`<div class="row" style="gap:6px"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">${sg(12,12,s)}</svg><span class="m">${t}</span></div>`;
 function evCard(e){const d=dd(e.date),b=DB.book[e.id],l=left(e);
 const act=b?`<button class="bt o" data-act="ev" data-p="${e.id}">Изменить запись</button>`:l>0?`<button class="bt" data-act="ev" data-p="${e.id}">Записаться</button>`:DB.wait[e.id]?`<button class="bt o" disabled>Вы в листе ожидания</button>`:`<button class="bt o" data-act="wait" data-p="${e.id}">В лист ожидания</button>`;
@@ -2551,7 +2643,7 @@ return `<div class="k col"><div class="row"><div class="dt"><b>${d.n}</b><span>$
 
 const V={
 home:()=>{const c=pos(),nx=c<5?5:c<10?10:c<15?15:5,l=nx-c,u=inTg&&tg.initDataUnsafe&&tg.initDataUnsafe.user,st=streak(),ev=nextEv(),d=dd(ev.date),b=DB.book[ev.id],cw=widx(day());
-const w=new Set(DB.visits.map(widx)),pills=[5,4,3,2,1,0].map(i=>w.has(cw-i)?`<div class="pill f">${ic(CHECK,16,3)}</div>`:`<div class="pill e"></div>`).join("");
+const w=new Set(DB.visits.map(widx)),lw=w.has(cw)?cw:cw-1,p0=st>6?lw-5:lw-st+1,pills=[0,1,2,3,4,5].map(i=>st>0&&w.has(p0+i)?`<div class="pill f">${ic(CHECK,16,3)}</div>`:`<div class="pill e"></div>`).join("");
 const g=greet(u&&u.first_name?u.first_name:"");
 return `${mark}
 <div class="sec" style="gap:8px"><h1 class="h" style="font-size:26px">${esc(g.t)}</h1><div style="font-size:16px;line-height:1.45;color:var(--mu)">${esc(g.s)}</div></div>
@@ -2603,13 +2695,13 @@ const newsBlock=()=>{const n=sortN().slice(0,5);return n.length?`<div class="sec
 const rowA=(t,sub,kind,i)=>`<div class="k row sb"><div style="min-width:0;flex:1"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t)}</b><div class="m">${sub}</div></div><button class="ch" data-act="aform" data-p="${kind}" data-i="${i}">Изменить</button><button class="ch" data-act="adel" data-p="${kind}" data-i="${i}">Удалить</button></div>`;
 const addBar=(k,l)=>`<div class="sticky"><button class="bt" data-act="aform" data-p="${k}" data-i="-1">${l}</button></div>`;
 const NOTE=`<div class="m" style="line-height:1.5">${inTg?"Изменения сохраняются на сервере и сразу видны всем гостям.":"Вне Telegram изменения хранятся только на этом устройстве."}</div>`;
-const FORMS={news:{t:"Новость",b:"anews",f:[["title","Заголовок","text"],["text","Текст","area"],["img","Ссылка на фото (необязательно)","text"],["pin","Закрепить вверху","bool"]]},item:{t:"Позиция меню",b:"amenu",f:[["name","Название","text"],["desc","Описание","text"],["price","Цена (число)","text"],["rub","Цена в рублях (иначе в комплиментах)","bool"],["vol","Объём или вес, например 200 мл","text"],["img","Ссылка на фото (необязательно)","text"]]},event:{t:"Вечер",b:"aevents",f:[["title","Название","text"],["tag","Исполнитель или формат","text"],["date","Дата","date"],["time","Время","text"],["desc","Описание вечера (программа, что взять с собой)","area"]]},cat:{t:"Новая категория",b:"amenu",f:[["name","Название","text"]]}};
-const src=(k,i)=>i<0?{}:k==="news"?Object.assign({},NEWS[i]):k==="event"?Object.assign({},EVENTS[i]):k==="item"?(x=>({name:x.n,desc:x.d,price:String(x.p).replace(".",","),rub:x.u==="r"?1:0,vol:x.v||"",img:x.img||"",art:x.art||""}))(MENU[S.acat][i]):{};
+const FORMS={news:{t:"Новость",b:"anews",f:[["title","Заголовок","text"],["text","Текст","area"],["img","Ссылка на фото (необязательно)","text"],["pin","Закрепить вверху","bool"]]},item:{t:"Позиция меню",b:"amenu",f:[["name","Название","text"],["desc","Описание","text"],["price","Цена (число)","text"],["pv","Цены по размерам, например 7 | 8 (необязательно)","text"],["rub","Цена в рублях (иначе в комплиментах)","bool"],["vol","Объём или вес, например 200 мл","text"],["img","Ссылка на фото (необязательно)","text"]]},event:{t:"Вечер",b:"aevents",f:[["title","Название","text"],["tag","Исполнитель или формат","text"],["date","Дата","date"],["time","Время","text"],["desc","Описание вечера (программа, что взять с собой)","area"]]},cat:{t:"Новая категория",b:"amenu",f:[["name","Название","text"]]}};
+const src=(k,i)=>i<0?{}:k==="news"?Object.assign({},NEWS[i]):k==="event"?Object.assign({},EVENTS[i]):k==="item"?(x=>({name:x.n,desc:x.d,price:String(x.p).replace(".",","),pv:x.pv||"",rub:x.u==="r"?1:0,vol:x.v||"",img:x.img||"",art:x.art||""}))(MENU[S.acat][i]):{};
 const rf=()=>{FORMS[S.form.kind].f.forEach(f=>{if(f[2]!=="bool"){const el=$("#f_"+f[0]);if(el)S.form.v[f[0]]=el.value}})};
 function fsave(){rf();const F=S.form,v=F.v,i=F.i,k=F.kind,need=k==="news"?v.title:(k==="item"||k==="cat")?v.name:(v.title&&v.date);
 if(!String(need||"").trim()){S.msg=["bad","Заполните обязательные поля"];return}
 if(k==="news"){const o={id:v.id||"n"+Date.now(),title:v.title.trim(),text:(v.text||"").trim(),pin:v.pin?1:0,date:v.date||day(),img:(v.img||"").trim(),art:v.art||""};i>=0?NEWS[i]=o:NEWS.unshift(o)}
-else if(k==="item"){const a={n:v.name.trim(),d:(v.desc||"").trim(),p:parseFloat(String(v.price||"0").replace(",","."))||0,u:v.rub?"r":"k",v:(v.vol||"").trim(),img:(v.img||"").trim(),art:v.art||""};i>=0?MENU[S.acat][i]=a:MENU[S.acat].push(a)}
+else if(k==="item"){const a={n:v.name.trim(),d:(v.desc||"").trim(),p:parseFloat(String(v.price||"0").replace(",","."))||0,u:v.rub?"r":"k",v:(v.vol||"").trim(),img:(v.img||"").trim(),art:v.art||""};if((v.pv||"").trim())a.pv=v.pv.trim();i>=0?MENU[S.acat][i]=a:MENU[S.acat].push(a)}
 else if(k==="event"){const o={id:v.id||"e"+Date.now(),title:v.title.trim(),tag:(v.tag||"").trim(),date:v.date,time:(v.time||"19:00").trim(),desc:(v.desc||"").trim(),occ:v.occ||[]};i>=0?EVENTS[i]=o:EVENTS.push(o);EVENTS.sort((a,b)=>a.date.localeCompare(b.date))}
 else{const n=v.name.trim();if(!MENU[n])MENU[n]=[];S.acat=n}
 saveCT(k==="news"?"news":k==="event"?"events":"menu");S.sub=F.b;S.msg=null}
@@ -2626,8 +2718,12 @@ news:()=>`${hdr("Новости")}${sortN().map(x=>newsCard(x,1)).join("")}`,
 newsitem:()=>{const x=NEWS.find(n=>n.id===S.p);if(!x)return hdr("Новость");const d=dd(x.date);return `${hdr("Новость")}<div class="k" style="padding:0;overflow:hidden">${cover(x)}<div class="col" style="padding:18px 20px 22px;gap:10px"><div class="m">${d.n} ${d.m}</div><b style="font-size:18px">${esc(x.title)}</b><div style="white-space:pre-wrap;line-height:1.5">${esc(x.text)}</div></div></div>`},
 admin:()=>`${hdr("Администратор")}${NOTE}${tile("anews","Новости","Добавить и изменить новости на главной")}${tile("amenu","Меню","Позиции, цены, описания и фото")}${tile("aevents","Вечера","Название, дата и время")}`,
 anews:()=>`${hdr("Новости")}${sortN().map(x=>rowA(x.title,(x.pin?"Закреплено · ":"")+x.date,"news",NEWS.indexOf(x))).join("")||'<div class="m">Новостей пока нет</div>'}${addBar("news","Добавить новость")}`,
+abook:()=>{const e=EVENTS.find(x=>x.id===S.p);if(!e)return hdr("Брони");const d=dd(e.date),rows=(S.bk||[]).filter(r=>r.event_id===e.id),bs=new Set();rows.forEach(r=>r.seats.forEach(x=>bs.add(x)));
+const tbl=S.bk===null?'<div class="m">Загружаем…</div>':rows.length?rows.map(r=>{const nm=esc(r.name||"Без имени"),url=r.username?"https://t.me/"+r.username:"tg://user?id="+r.user_id,tb=[...new Set(r.seats.map(x=>x.slice(0,-1)))];
+return `<div class="k row sb" style="gap:10px"><div style="min-width:0;flex:1"><b style="display:block;overflow:hidden;text-overflow:ellipsis">${nm}</b><div class="m">${r.username?"@"+esc(r.username):"нет username, ссылка может не открыться"}</div><div style="margin-top:4px;font-size:14px">${isWhole(r.seats)?"Весь стол "+tableOf(r.seats[0]):"Места: "+r.seats.slice().sort().join(", ")} <span class="m">(${tb.map(t=>"стол "+t).join(", ")})</span></div></div><button class="ch on" data-act="tglink" data-p="${esc(url)}">Написать</button></div>`}).join(""):'<div class="m">Пока никто не записался через приложение</div>';
+return `${hdr("Брони")}<div class="dk" style="padding:12px 16px"><b>${esc(e.title)}${e.tag?" · "+esc(e.tag.toLowerCase()):""}</b><div class="m">${d.w}, ${d.n} ${d.m} · ${e.time}</div></div>${mapSvg(e,bs)}<div class="row sb">${lg("f","Свободно")}${lg("s","Бронь гостей")}${lg("o","Занято вручную")}</div><div class="row sb"><h2 class="st">Кто записался</h2><span class="m">${S.bk?bs.size+" "+pl(bs.size,["место","места","мест"]):""}</span></div>${tbl}`},
 amenu:()=>{if(!MENU[S.acat])S.acat=Object.keys(MENU)[0];return `${hdr("Меню")}<div class="row hs" style="gap:8px">${Object.keys(MENU).map(k=>`<button class="ch ${k===S.acat?"on":""}" data-act="acat" data-p="${esc(k)}">${esc(k)}</button>`).join("")}<button class="ch" data-act="aform" data-p="cat" data-i="-1">+ Категория</button></div>${MENU[S.acat].map((x,i)=>rowA(x.n,esc(fmtP(x)),"item",i)).join("")||'<div class="m">В категории пока пусто</div>'}${addBar("item","Добавить позицию")}`},
-aevents:()=>`${hdr("Вечера")}${EVENTS.map((e,i)=>rowA(e.title,e.date+" · "+e.time,"event",i)).join("")}${addBar("event","Добавить вечер")}`,
+aevents:()=>`${hdr("Вечера")}${EVENTS.map((e,i)=>`<div class="col" style="gap:6px">${rowA(e.title,e.date+" · "+e.time,"event",i)}<button class="bt o" data-act="abk" data-p="${esc(e.id)}">Брони и карта мест</button></div>`).join("")}${addBar("event","Добавить вечер")}`,
 form:()=>{const F=FORMS[S.form.kind],v=S.form.v;return `${hdr(F.t)}${S.msg?`<div class="msg bad" role="alert">${S.msg[1]}</div>`:""}${F.f.map(f=>(f[0]==="img"&&String(v.img||"").startsWith("data:"))?"":f[2]==="bool"?`<button class="ch ${v[f[0]]?"on":""}" data-act="ftog" data-p="${f[0]}" style="align-self:flex-start">${f[1]}${v[f[0]]?": да":""}</button>`:`<div><label class="lb" for="f_${f[0]}">${f[1]}</label>${f[2]==="area"?`<textarea id="f_${f[0]}" class="fl" rows="5">${esc(v[f[0]]||"")}</textarea>`:`<input id="f_${f[0]}" class="fl" type="${f[2]==="date"?"date":"text"}" value="${esc(v[f[0]]||"")}">`}</div>`).join("")}${S.form.kind==="news"||S.form.kind==="item"?photoBlock(v,S.form.kind==="item"):""}<div class="sticky"><button class="bt" data-act="fsave">Сохранить</button></div>`}
 });
 
@@ -2663,7 +2759,7 @@ const tb=$("#tabs");tb.style.display=S.sub?"none":"flex";
 tb.innerHTML=TABS.map(t=>t[0]==="home"?`<button class="hb ${S.tab==="home"?"on":""}" data-go="home" aria-label="Главная"><span class="hc">${ic(t[2],26)}</span><span style="margin-top:2px">${t[1]}</span></button>`:`<button class="${t[0]===S.tab?"on":""}" data-go="${t[0]}">${ic(t[2])}${t[1]}</button>`).join("");
 if(inTg){S.sub?tg.BackButton.show():tg.BackButton.hide()}
 if(S.sub==="barista"&&!btm){btm=setInterval(baristaTick,1000);baristaTick()}}
-function back(){if(!S.sub){S.tab="home";return}S.sel=[];S.msg=null;S.sub=S.sub==="form"?S.form.b:({anews:"admin",amenu:"admin",aevents:"admin"}[S.sub]||null)}
+function back(){if(!S.sub){S.tab="home";return}S.sel=[];S.msg=null;S.sub=S.sub==="form"?S.form.b:({anews:"admin",amenu:"admin",aevents:"admin",abook:"aevents"}[S.sub]||null)}
 async function bookNow(){if(BUSY)return;const id=S.p,sel=S.sel.slice();
 if(!inTg){DB.book[id]=sel;save();S.sub="done";render();return}
 BUSY=true;try{const r=await api("book",{event_id:id,seats:sel});if(r.content)applyContent(r);
@@ -2696,6 +2792,8 @@ else if(a==="newsopen"){S.p=d.p;S.sub="newsitem"}
 else if(a==="acat")S.acat=d.p;
 else if(a==="aform"){const i=+d.i;S.form={kind:d.p,i:i,v:src(d.p,i),b:FORMS[d.p].b};S.msg=null;S.sub="form"}
 else if(a==="rmimg"){rf();S.form.v.img=""}
+else if(a==="abk"){S.p=d.p;S.bk=null;S.sub="abook";S.msg=null;render();api("adminbookings").then(r=>{S.bk=r.rows||[];if(r.error)toast(r.error);if(S.sub==="abook")render()}).catch(()=>{S.bk=[];toast("Нет связи с сервером");if(S.sub==="abook")render()});return}
+else if(a==="tglink"){const u=d.p;try{if(u.startsWith("https://t.me/")&&tg.openTelegramLink)tg.openTelegramLink(u);else window.open(u,"_blank")}catch(e){window.open(u,"_blank")}}
 else if(a==="ftog"){rf();S.form.v[d.p]=S.form.v[d.p]?0:1}
 else if(a==="fsave")fsave();
 else if(a==="adel"){const i=+d.i,k=d.p,m="Удалить? Это действие нельзя отменить.",ok=()=>{if(k==="news")NEWS.splice(i,1);else if(k==="event")EVENTS.splice(i,1);else MENU[S.acat].splice(i,1);saveCT(k==="news"?"news":k==="event"?"events":"menu");render()};(inTg&&tg.showConfirm)?tg.showConfirm(m,y=>y&&ok()):(confirm(m)&&ok());return}
@@ -2711,7 +2809,8 @@ function cropPhoto(src,ratio,done){const W=Math.min(innerWidth-32,420),H=Math.ro
 im.onload=()=>{const iw=im.naturalWidth,ih=im.naturalHeight,base=Math.max(W/iw,H/ih);let z=1,x=(W-iw*base)/2,y=(H-ih*base)/2;
 const ov=document.createElement("div");ov.id="crop";ov.style.cssText="position:fixed;inset:0;z-index:99;background:rgba(20,10,8,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;touch-action:none";
 ov.innerHTML=`<div style="color:#fff;font-size:14px;text-align:center;line-height:1.4">Двигайте фото пальцем.<br>Масштаб меняется ползунком.</div><div id="cf" style="width:${W}px;height:${H}px;position:relative;overflow:hidden;border-radius:14px;background:#000;touch-action:none;cursor:grab"><img id="ci" alt="" draggable="false" style="position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;width:${iw}px;height:${ih}px;user-select:none;pointer-events:none"></div><input id="cz" type="range" min="1" max="4" step="0.01" value="1" style="width:${W}px" aria-label="Масштаб"><div style="display:flex;gap:10px;width:${W}px"><button class="bt o" id="cc" style="flex:1;background:var(--card)">Отмена</button><button class="bt" id="cd" style="flex:1">Готово</button></div>`;
-document.body.appendChild(ov);const img=$("#ci");img.src=src;
+document.body.appendChild(ov);try{inTg&&tg.disableVerticalSwipes&&tg.disableVerticalSwipes()}catch(e){}ov.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
+const closeCrop=()=>{ov.remove();try{inTg&&tg.enableVerticalSwipes&&tg.enableVerticalSwipes()}catch(e){}};const img=$("#ci");img.src=src;
 const sc=()=>base*z,clamp=()=>{x=Math.min(0,Math.max(W-iw*sc(),x));y=Math.min(0,Math.max(H-ih*sc(),y))},
 paint=()=>{clamp();img.style.transform=`translate(${x}px,${y}px) scale(${sc()})`;$("#cz").value=z},
 setZ=n=>{n=Math.min(4,Math.max(1,n));const cx=(W/2-x)/sc(),cy=(H/2-y)/sc();z=n;x=W/2-cx*sc();y=H/2-cy*sc();paint()};
@@ -2722,9 +2821,9 @@ if(P.size===2){const a=[...P.values()],d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1]
 const up=e=>{P.delete(e.pointerId);pd=0};fr.addEventListener("pointerup",up);fr.addEventListener("pointercancel",up);
 fr.addEventListener("wheel",e=>{e.preventDefault();setZ(z*(e.deltaY<0?1.08:1/1.08))},{passive:false});
 $("#cz").addEventListener("input",e=>setZ(+e.target.value));
-$("#cc").addEventListener("click",()=>ov.remove());
+$("#cc").addEventListener("click",closeCrop);
 $("#cd").addEventListener("click",()=>{const OW=ratio>1.2?1280:900,c=document.createElement("canvas");c.width=OW;c.height=Math.round(OW/ratio);
-c.getContext("2d").drawImage(im,-x/sc(),-y/sc(),W/sc(),H/sc(),0,0,c.width,c.height);ov.remove();done(c.toDataURL("image/jpeg",.82))})};
+c.getContext("2d").drawImage(im,-x/sc(),-y/sc(),W/sc(),H/sc(),0,0,c.width,c.height);closeCrop();done(c.toDataURL("image/jpeg",.82))})};
 im.src=src}
 document.addEventListener("change",e=>{const f=e.target;if(!f||f.id!=="f_file"||!f.files||!f.files[0])return;const file=f.files[0],rd=new FileReader();
 rd.onload=()=>{rf();const ratio=S.form&&S.form.kind==="item"?1:16/9;f.value="";
